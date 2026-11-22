@@ -20,17 +20,24 @@ CosmeticService:Initialize(NetworkService, DataService)
 MonetizationService:Initialize(NetworkService, DataService, RoundService)
 
 local function playerAdded(player)
-	DataService:LoadPlayer(player)
-	MonetizationService:RefreshPasses(player)
-	CosmeticService:OnPlayerAdded(player)
+	-- Connect spawn handling immediately. DataStore requests can take several
+	-- seconds, and the player must not be left falling before their profile loads.
 	RoundService:OnPlayerAdded(player)
-end
 
-Players.PlayerAdded:Connect(playerAdded)
-for _, player in Players:GetPlayers() do task.spawn(playerAdded, player) end
+	task.spawn(function()
+		DataService:LoadPlayer(player)
+		if player.Parent ~= Players then return end
+
+		MonetizationService:RefreshPasses(player)
+		CosmeticService:OnPlayerAdded(player)
+	end)
+end
 
 NetworkService:GetFunction("GetSnapshot").OnServerInvoke = function(player)
 	return RoundService:GetSnapshot(player)
 end
+
+Players.PlayerAdded:Connect(playerAdded)
+for _, player in Players:GetPlayers() do playerAdded(player) end
 
 RoundService:Start()
