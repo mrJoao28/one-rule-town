@@ -1,9 +1,13 @@
-name: Validate
+name: Validate and Publish
 
 on:
   push:
     branches: [main]
   pull_request:
+
+concurrency:
+  group: roblox-production-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -28,4 +32,21 @@ jobs:
           name: OneRuleTown-Roblox-Place
           path: OneRuleTown.rbxlx
           if-no-files-found: error
+      - name: Publish place to Roblox
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          ROBLOX_API_KEY: ${{ secrets.ROBLOX_API_KEY }}
+          ROBLOX_UNIVERSE_ID: ${{ vars.ROBLOX_UNIVERSE_ID }}
+          ROBLOX_PLACE_ID: ${{ vars.ROBLOX_PLACE_ID }}
+        run: |
+          test -n "$ROBLOX_API_KEY"
+          test -n "$ROBLOX_UNIVERSE_ID"
+          test -n "$ROBLOX_PLACE_ID"
+
+          curl --fail-with-body --silent --show-error \
+            --request POST \
+            "https://apis.roblox.com/universes/v1/${ROBLOX_UNIVERSE_ID}/places/${ROBLOX_PLACE_ID}/versions?versionType=Published" \
+            --header "x-api-key: ${ROBLOX_API_KEY}" \
+            --header "Content-Type: application/xml" \
+            --data-binary "@OneRuleTown.rbxlx"
 
