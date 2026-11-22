@@ -89,7 +89,6 @@ function MapService:Initialize()
 		old:Destroy()
 	end
 
-	Workspace.FallenPartsDestroyHeight = -80
 	Lighting.ClockTime = 14
 	Lighting.Brightness = 2.5
 	Lighting.Ambient = Color3.fromRGB(128, 137, 155)
