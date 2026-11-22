@@ -22,4 +22,10 @@ jobs:
           chmod +x rojo
       - name: Build Roblox place
         run: ./rojo build default.project.json --output OneRuleTown.rbxlx
+      - name: Upload playable Roblox place
+        uses: actions/upload-artifact@v4
+        with:
+          name: OneRuleTown-Roblox-Place
+          path: OneRuleTown.rbxlx
+          if-no-files-found: error
 
