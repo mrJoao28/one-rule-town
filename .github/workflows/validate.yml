@@ -43,10 +43,35 @@ jobs:
           test -n "$ROBLOX_UNIVERSE_ID"
           test -n "$ROBLOX_PLACE_ID"
 
-          curl --fail-with-body --silent --show-error \
-            --request POST \
-            "https://apis.roblox.com/universes/v1/${ROBLOX_UNIVERSE_ID}/places/${ROBLOX_PLACE_ID}/versions?versionType=Published" \
-            --header "x-api-key: ${ROBLOX_API_KEY}" \
-            --header "Content-Type: application/xml" \
-            --data-binary "@OneRuleTown.rbxlx"
+          response_file="$(mktemp)"
+          for attempt in {1..8}; do
+            http_code="$(curl --silent --show-error \
+              --output "$response_file" \
+              --write-out "%{http_code}" \
+              --request POST \
+              "https://apis.roblox.com/universes/v1/${ROBLOX_UNIVERSE_ID}/places/${ROBLOX_PLACE_ID}/versions?versionType=Published" \
+              --header "x-api-key: ${ROBLOX_API_KEY}" \
+              --header "Content-Type: application/xml" \
+              --data-binary "@OneRuleTown.rbxlx" || true)"
+
+            cat "$response_file"
+            if [[ "$http_code" =~ ^2 ]]; then
+              echo "Roblox place published successfully."
+              exit 0
+            fi
+
+            if [[ "$http_code" == "409" || "$http_code" =~ ^5 || -z "$http_code" ]]; then
+              if [[ "$attempt" -lt 8 ]]; then
+                echo "Roblox is temporarily busy (HTTP ${http_code:-network-error}); retrying in 20 seconds."
+                sleep 20
+                continue
+              fi
+            fi
+
+            echo "Roblox publishing failed with HTTP ${http_code:-network-error}."
+            exit 1
+          done
+
+          echo "Roblox remained busy after all publish attempts."
+          exit 1
 
