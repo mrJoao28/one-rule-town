@@ -254,12 +254,19 @@ end
 
 function DataService:ProcessReceipt(player, purchaseId, grantKind, amount)
 	local key = "player_" .. player.UserId
+	local sessionSnapshot = deepCopy(profiles[player.UserId] or DEFAULT_DATA)
 	local success, saved = retry(function()
 		return self.Store:UpdateAsync(key, function(old)
-			local data = reconcile(type(old) == "table" and old or deepCopy(DEFAULT_DATA), DEFAULT_DATA)
-			for _, processedId in data.ProcessedReceipts do
+			local storedData = reconcile(type(old) == "table" and old or deepCopy(DEFAULT_DATA), DEFAULT_DATA)
+			for _, processedId in storedData.ProcessedReceipts do
 				if processedId == purchaseId then
-					return data
+					return storedData
+				end
+			end
+			local data = reconcile(deepCopy(sessionSnapshot), DEFAULT_DATA)
+			for _, processedId in storedData.ProcessedReceipts do
+				if not table.find(data.ProcessedReceipts, processedId) then
+					table.insert(data.ProcessedReceipts, processedId)
 				end
 			end
 

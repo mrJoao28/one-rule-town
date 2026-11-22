@@ -94,7 +94,9 @@ function MapService:Initialize()
 	Lighting.Brightness = 2.5
 	Lighting.Ambient = Color3.fromRGB(128, 137, 155)
 	Lighting.OutdoorAmbient = Color3.fromRGB(155, 165, 180)
-	Lighting.Technology = Enum.Technology.Future
+	pcall(function()
+		Lighting.Technology = Enum.Technology.Future
+	end)
 
 	local atmosphere = Lighting:FindFirstChildOfClass("Atmosphere") or Instance.new("Atmosphere")
 	atmosphere.Density = 0.25

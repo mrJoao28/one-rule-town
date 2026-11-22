@@ -281,6 +281,8 @@ function RoundService:Start()
 				self:TeleportPlayer(player, self.MapService.LobbyPosition + Vector3.new(math.random(-7, 7), 0, math.random(-5, 5)))
 			end
 			self:RunTimer(Config.ResultsDuration)
+			self.Alive = {}
+			self.Participants = {}
 		end
 	end)
 end
