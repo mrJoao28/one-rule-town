@@ -66,6 +66,22 @@ local function createBuilding(parent: Instance, name: string, center: Vector3, s
 	part(model, "LeftWall", Vector3.new(wallThickness, size.Y, size.Z), CFrame.new(center + Vector3.new(-size.X / 2, size.Y / 2, 0)), color)
 	part(model, "RightWall", Vector3.new(wallThickness, size.Y, size.Z), CFrame.new(center + Vector3.new(size.X / 2, size.Y / 2, 0)), color)
 	part(model, "Roof", Vector3.new(size.X + 2, 1, size.Z + 2), CFrame.new(center + Vector3.new(0, size.Y, 0)), color:Lerp(Color3.new(0, 0, 0), 0.12))
+	local glass = Color3.fromRGB(105, 214, 240)
+	local trim = Color3.fromRGB(255, 240, 194)
+	for _, side in { -1, 1 } do
+		for _, level in { 6, 11 } do
+			for index = -1, 1 do
+				local window = part(model, "LitWindow", Vector3.new(4, 3.5, 0.18), CFrame.new(center + Vector3.new(index * (size.X / 4), level, side * (size.Z / 2 + 0.55))), glass, Enum.Material.Glass)
+				window.CanCollide = false
+				part(model, "WindowSill", Vector3.new(5, 0.3, 0.7), CFrame.new(window.Position - Vector3.new(0, 1.9, 0)), trim)
+			end
+		end
+	end
+	part(model, "ShopAwning", Vector3.new(size.X - 2, 0.6, 4), CFrame.new(center + Vector3.new(0, 5, -size.Z / 2 - 2)), trim)
+	for _, offset in { -size.X / 2 + 2, size.X / 2 - 2 } do
+		part(model, "AwningStripe", Vector3.new(2, 0.1, 4), CFrame.new(center + Vector3.new(offset, 5.36, -size.Z / 2 - 2)), color)
+	end
+	part(model, "FrontDoor", Vector3.new(6, 7, 0.35), CFrame.new(center + Vector3.new(0, 3.5, -size.Z / 2 - 0.5)), Color3.fromRGB(51, 80, 98), Enum.Material.Glass).CanCollide = false
 
 	local sign = part(model, "BuildingSign", Vector3.new(math.min(size.X - 2, 18), 3, 0.6), CFrame.new(center + Vector3.new(0, size.Y - 2.5, -size.Z / 2 - 0.5)), Color3.fromRGB(32, 36, 45))
 	addBillboard(sign, signText, Color3.fromRGB(255, 244, 205))
@@ -114,6 +130,16 @@ local function decorateTown(parent: Instance)
 	local court = part(parent, "HussTrainingCourt", Vector3.new(30, 0.5, 24), CFrame.new(-58, 0.3, 0), Color3.fromRGB(62, 135, 205), Enum.Material.SmoothPlastic)
 	part(parent, "CourtCenter", Vector3.new(0.4, 0.06, 22), CFrame.new(-58, 0.59, 0), COLORS.Cream, Enum.Material.Neon)
 	addBillboard(court, "HUSS HUSS TRAINING", COLORS.Yellow)
+	for _, x in { -71, -45 } do
+		part(parent, "HoopPole", Vector3.new(0.6, 10, 0.6), CFrame.new(x, 5.5, 0), Color3.fromRGB(42, 57, 72), Enum.Material.Metal)
+		part(parent, "Backboard", Vector3.new(0.5, 5, 7), CFrame.new(x, 10, 0), COLORS.Cream)
+		local rim = part(parent, "BasketRim", Vector3.new(2, 0.3, 2), CFrame.new(x + (if x < -58 then 1.5 else -1.5), 8.5, 0), COLORS.Red, Enum.Material.Neon)
+		rim.CanCollide = false
+	end
+	for _, position in { Vector3.new(-35, 0, -35), Vector3.new(35, 0, 35), Vector3.new(-35, 0, 35), Vector3.new(35, 0, -35) } do
+		part(parent, "ParkBenchSeat", Vector3.new(7, 0.5, 2), CFrame.new(position + Vector3.new(0, 1.7, 0)), Color3.fromRGB(139, 81, 55), Enum.Material.Wood)
+		part(parent, "ParkBenchBack", Vector3.new(7, 2, 0.4), CFrame.new(position + Vector3.new(0, 2.6, 1)), Color3.fromRGB(139, 81, 55), Enum.Material.Wood)
+	end
 end
 
 function MapService:Initialize()
