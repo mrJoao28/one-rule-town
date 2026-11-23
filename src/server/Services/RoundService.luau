@@ -19,11 +19,12 @@ local function humanoidOf(player)
 	return character and character:FindFirstChildOfClass("Humanoid") or nil
 end
 
-function RoundService:Initialize(networkService, mapService, ruleService, dataService)
+function RoundService:Initialize(networkService, mapService, ruleService, dataService, crowdService)
 	self.Network = networkService
 	self.MapService = mapService
 	self.RuleService = ruleService
 	self.DataService = dataService
+	self.CrowdService = crowdService
 	self.GameState = networkService:GetEvent("GameState")
 	self.PlayerState = networkService:GetEvent("PlayerState")
 	self.UseRevive = networkService:GetEvent("UseRevive")
@@ -237,6 +238,7 @@ function RoundService:Start()
 
 			local context = {
 				MapService = self.MapService,
+				CrowdService = self.CrowdService,
 				GetAlivePlayers = function() return self:GetAlivePlayers() end,
 				IsAlive = function(player) return self:IsAlive(player) end,
 				Eliminate = function(player, reason) self:Eliminate(player, reason) end,
