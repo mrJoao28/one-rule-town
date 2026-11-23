@@ -10,13 +10,13 @@ end
 
 function Rule:CheckPlayer(player, context)
 	local players = context.GetAlivePlayers()
-	if #players <= 1 then
+	if #players <= 1 and not context.CrowdService then
 		self.AloneSince[player.UserId] = nil
 		return false
 	end
 	local root = Utils.GetRoot(player)
 	if not root then return false end
-	local nearest = math.huge
+	local nearest = context.CrowdService and context.CrowdService:GetNearestDistance(root.Position) or math.huge
 	for _, other in players do
 		if other ~= player then
 			local otherRoot = Utils.GetRoot(other)
