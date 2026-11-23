@@ -44,11 +44,17 @@ function CrowdService:Initialize(mapService)
 			local forward = Vector3.new(math.cos(nextAngle) * radius, 2.5, math.sin(nextAngle) * radius)
 			local facing = CFrame.lookAt(base, forward)
 			local stride = math.sin(self.Elapsed * 11 + index)
+			if index <= 2 then
+				-- Two residents dance on the meme court while the others fill the streets.
+				local beat = self.Elapsed * 6 + index * math.pi
+				facing = CFrame.new(-58 + (index - 1.5) * 9, 2.5 + math.max(0, math.sin(beat)) * 0.55, -4) * CFrame.Angles(0, math.sin(beat / 2) * 0.35, 0)
+				stride = math.sin(beat)
+			end
 			resident.Root.CFrame = facing
 			resident.Torso.CFrame = facing * CFrame.new(0, 0.1 + math.abs(stride) * 0.12, 0)
 			resident.Head.CFrame = facing * CFrame.new(0, 2.1 + math.abs(stride) * 0.12, 0)
-			resident.LeftArm.CFrame = facing * CFrame.new(-1.1, 0.05, stride * 0.5)
-			resident.RightArm.CFrame = facing * CFrame.new(1.1, 0.05, -stride * 0.5)
+			resident.LeftArm.CFrame = facing * CFrame.new(-1.1, if index <= 2 then 1 + stride * 0.35 else 0.05, stride * 0.5)
+			resident.RightArm.CFrame = facing * CFrame.new(1.1, if index <= 2 then 1 - stride * 0.35 else 0.05, -stride * 0.5)
 			resident.LeftLeg.CFrame = facing * CFrame.new(-0.45, -1.65, -stride * 0.5)
 			resident.RightLeg.CFrame = facing * CFrame.new(0.45, -1.65, stride * 0.5)
 		end
@@ -78,6 +84,22 @@ function CrowdService:CreateResident(index)
 		Speed = 0.22 + index * 0.03,
 	}
 	resident.Root.Transparency = 1
+	if index <= 2 then
+		local badge = Instance.new("BillboardGui")
+		badge.Name = "HussDanceBadge"
+		badge.Size = UDim2.fromOffset(130, 36)
+		badge.StudsOffset = Vector3.new(0, 4, 0)
+		badge.AlwaysOnTop = true
+		badge.Parent = resident.Head
+		local label = Instance.new("TextLabel")
+		label.Size = UDim2.fromScale(1, 1)
+		label.BackgroundColor3 = Color3.fromRGB(28, 35, 54)
+		label.TextColor3 = Color3.fromRGB(255, 220, 83)
+		label.Font = Enum.Font.GothamBlack
+		label.TextScaled = true
+		label.Text = "HUSS HUSS!"
+		label.Parent = badge
+	end
 	return resident
 end
 
