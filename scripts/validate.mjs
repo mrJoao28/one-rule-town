@@ -16,7 +16,7 @@ const ruleFiles = fs.readdirSync(rulesDirectory)
 	.filter((file) => file.endsWith(".luau") && file !== "RuleUtils.luau")
 	.sort();
 
-assert.equal(ruleFiles.length, 10, "The MVP must ship with exactly ten rules");
+assert.equal(ruleFiles.length, 11, "The game must ship with eleven rules");
 
 const catalog = read("src/shared/RuleCatalog.luau");
 const ruleIds = [];

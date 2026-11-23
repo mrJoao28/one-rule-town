@@ -1,6 +1,11 @@
 --!strict
 
 local RuleCatalog = {
+	HussHussCourt = {
+		DisplayName = "HUSS HUSS! REACH THE COURT",
+		Description = "Find the blue training court before twelve seconds pass.",
+		Accent = Color3.fromRGB(255, 208, 66),
+	},
 	KeepMoving = {
 		DisplayName = "KEEP MOVING",
 		Description = "Stop for too long and the town will notice.",
