@@ -1,13 +1,6 @@
 name: Publish Roblox artwork
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - .github/workflows/publish-artwork.yml
-      - scripts/publish-artwork.mjs
-      - assets/marketing/icon.jpg
-      - assets/marketing/thumbnail.jpg
   workflow_dispatch:
 
 jobs:
@@ -20,6 +13,6 @@ jobs:
           node-version: 24
       - name: Upload icon and cover to Roblox
         env:
-          ROBLOX_API_KEY: ${{ secrets.ROBLOX_API_KEY }}
+          ROBLOX_ASSET_API_KEY: ${{ secrets.ROBLOX_ASSET_API_KEY }}
           ROBLOX_PLACE_ID: ${{ vars.ROBLOX_PLACE_ID }}
         run: node scripts/publish-artwork.mjs
