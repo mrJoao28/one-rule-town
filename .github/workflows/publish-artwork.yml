@@ -1,18 +1,29 @@
 name: Publish Roblox artwork
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/publish-artwork.yml
+      - scripts/publish-artwork.mjs
+      - assets/marketing/icon.jpg
+      - assets/marketing/thumbnail.jpg
   workflow_dispatch:
 
 jobs:
   artwork:
     runs-on: ubuntu-latest
+    env:
+      ROBLOX_ASSET_API_KEY: ${{ secrets.ROBLOX_ASSET_API_KEY }}
+      ROBLOX_PLACE_ID: ${{ vars.ROBLOX_PLACE_ID }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 24
+      - name: Check asset key
+        if: env.ROBLOX_ASSET_API_KEY == ''
+        run: echo "ROBLOX_ASSET_API_KEY is not configured; artwork upload was skipped."
       - name: Upload icon and cover to Roblox
-        env:
-          ROBLOX_ASSET_API_KEY: ${{ secrets.ROBLOX_ASSET_API_KEY }}
-          ROBLOX_PLACE_ID: ${{ vars.ROBLOX_PLACE_ID }}
+        if: env.ROBLOX_ASSET_API_KEY != ''
         run: node scripts/publish-artwork.mjs
