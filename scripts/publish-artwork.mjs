@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
-const apiKey = process.env.ROBLOX_API_KEY;
+const apiKey = process.env.ROBLOX_ASSET_API_KEY;
 const placeId = process.env.ROBLOX_PLACE_ID;
 const userId = "11865929955";
-assert(apiKey && placeId, "ROBLOX_API_KEY and ROBLOX_PLACE_ID are required");
+assert(apiKey && placeId, "ROBLOX_ASSET_API_KEY and ROBLOX_PLACE_ID are required");
 
 const base = "https://apis.roblox.com/assets/v1";
 const headers = { "x-api-key": apiKey };
