@@ -21,16 +21,16 @@ local Config = {
 	},
 
 	Monetization = {
-		-- Replace zeroes after creating the products in Creator Dashboard.
+		-- IDs from the One Rule Town Creator Dashboard.
 		DeveloperProducts = {
-			Revive = { Id = 0, Amount = 1 },
-			TokensSmall = { Id = 0, Amount = 250 },
-			TokensMedium = { Id = 0, Amount = 750 },
-			TokensLarge = { Id = 0, Amount = 2000 },
+			Revive = { Id = 3734973315, Amount = 1 },
+			TokensSmall = { Id = 3734973609, Amount = 250 },
+			TokensMedium = { Id = 3734973663, Amount = 750 },
+			TokensLarge = { Id = 3734973705, Amount = 2000 },
 		},
 		GamePasses = {
-			VIP = 0,
-			DoubleTokens = 0,
+			VIP = 2095886806,
+			DoubleTokens = 2093448848,
 		},
 	},
 
