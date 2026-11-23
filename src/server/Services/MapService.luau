@@ -83,6 +83,39 @@ local function createTree(parent: Instance, position: Vector3)
 	crown.Shape = Enum.PartType.Ball
 end
 
+local function decorateTown(parent: Instance)
+	-- A coherent street layout provides visual anchors in every short video clip.
+	for _, side in { -1, 1 } do
+		part(parent, "Sidewalk", Vector3.new(7, 0.5, 180), CFrame.new(side * 19, 0.55, 0), COLORS.Sidewalk, Enum.Material.Pavement)
+		part(parent, "Sidewalk", Vector3.new(180, 0.5, 7), CFrame.new(0, 0.55, side * 19), COLORS.Sidewalk, Enum.Material.Pavement)
+		for index = -3, 3 do
+			local z = index * 24
+			local pole = part(parent, "StreetLamp", Vector3.new(0.6, 14, 0.6), CFrame.new(side * 22, 7.5, z), Color3.fromRGB(54, 64, 81), Enum.Material.Metal)
+			local bulb = part(parent, "LampGlow", Vector3.new(3.5, 0.7, 3.5), CFrame.new(side * 22, 14.7, z), COLORS.Yellow, Enum.Material.Neon)
+			bulb.CanCollide = false
+			local light = Instance.new("PointLight")
+			light.Range = 19
+			light.Brightness = 1.2
+			light.Color = COLORS.Yellow
+			light.Parent = bulb
+			pole.CanCollide = false
+		end
+	end
+	for index = -3, 3 do
+		if index ~= 0 then
+			part(parent, "RoadMarking", Vector3.new(0.6, 0.08, 9), CFrame.new(0, 0.62, index * 24), COLORS.Yellow, Enum.Material.Neon)
+			part(parent, "RoadMarking", Vector3.new(9, 0.08, 0.6), CFrame.new(index * 24, 0.67, 0), COLORS.Yellow, Enum.Material.Neon)
+		end
+	end
+	for _, position in { Vector3.new(-34, 0, 40), Vector3.new(34, 0, -40) } do
+		local board = part(parent, "TownNoticeBoard", Vector3.new(13, 9, 1), CFrame.new(position + Vector3.new(0, 5, 0)), Color3.fromRGB(37, 49, 69), Enum.Material.Wood)
+		addBillboard(board, "ONE RULE. SURVIVE.", COLORS.Yellow)
+	end
+	local court = part(parent, "HussTrainingCourt", Vector3.new(30, 0.5, 24), CFrame.new(-58, 0.3, 0), Color3.fromRGB(62, 135, 205), Enum.Material.SmoothPlastic)
+	part(parent, "CourtCenter", Vector3.new(0.4, 0.06, 22), CFrame.new(-58, 0.59, 0), COLORS.Cream, Enum.Material.Neon)
+	addBillboard(court, "HUSS HUSS TRAINING", COLORS.Yellow)
+end
+
 function MapService:Initialize()
 	local old = Workspace:FindFirstChild(MAP_NAME)
 	if old then
@@ -123,6 +156,7 @@ function MapService:Initialize()
 	local roadB = part(environment, "CrossRoad", Vector3.new(190, 1, 28), CFrame.new(0, 0.1, 0), COLORS.Road, Enum.Material.Asphalt)
 	CollectionService:AddTag(roadA, "TownFloor")
 	CollectionService:AddTag(roadB, "TownFloor")
+	decorateTown(environment)
 
 	part(environment, "Square", Vector3.new(38, 1.2, 38), CFrame.new(0, 0.65, 0), COLORS.Cream, Enum.Material.Pavement)
 
