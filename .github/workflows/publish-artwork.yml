@@ -1,0 +1,25 @@
+name: Publish Roblox artwork
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/publish-artwork.yml
+      - scripts/publish-artwork.mjs
+      - assets/marketing/icon.jpg
+      - assets/marketing/thumbnail.jpg
+  workflow_dispatch:
+
+jobs:
+  artwork:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Upload icon and cover to Roblox
+        env:
+          ROBLOX_API_KEY: ${{ secrets.ROBLOX_API_KEY }}
+          ROBLOX_PLACE_ID: ${{ vars.ROBLOX_PLACE_ID }}
+        run: node scripts/publish-artwork.mjs
