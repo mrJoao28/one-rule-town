@@ -4,6 +4,7 @@ local Config = {
 	GameName = "One Rule Town",
 	MinimumPlayers = 1,
 	MaximumPlayers = 12,
+	TargetTownPopulation = 6,
 	IntermissionDuration = 15,
 	RuleRevealDuration = 5,
 	RoundDuration = 60,
