@@ -34,7 +34,7 @@ async function operation(result) {
 
 function form(request, file, filename) {
   const data = new FormData();
-  data.append("request", new Blob([JSON.stringify(request)], { type: "application/json" }));
+  data.append("request", JSON.stringify(request));
   if (file) data.append("fileContent", new Blob([file], { type: "image/jpeg" }), filename);
   return data;
 }
