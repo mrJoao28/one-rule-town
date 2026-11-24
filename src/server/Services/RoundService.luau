@@ -243,6 +243,9 @@ function RoundService:Start()
 				IsAlive = function(player) return self:IsAlive(player) end,
 				Eliminate = function(player, reason) self:Eliminate(player, reason) end,
 				BroadcastEffect = function(name, data) self:BroadcastEffect(name, data) end,
+				ReportDanger = function(player, progress)
+					self.PlayerState:FireClient(player, { Type = "Danger", Progress = progress })
+				end,
 				Active = true,
 				StartedAt = os.clock(),
 			}

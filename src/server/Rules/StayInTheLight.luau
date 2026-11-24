@@ -13,13 +13,13 @@ function Rule:CheckPlayer(player, context)
 	if not root then return false end
 	if context.MapService:IsPointInsideTag(root.Position, "LightZone") then
 		self.OutsideSince[player.UserId] = nil
-		return false
+		return false, nil, 0
 	end
 	self.OutsideSince[player.UserId] = self.OutsideSince[player.UserId] or os.clock()
 	if os.clock() - self.OutsideSince[player.UserId] >= 3 then
 		return true, "You stayed in the dark."
 	end
-	return false
+	return false, nil, (os.clock() - self.OutsideSince[player.UserId]) / 3
 end
 
 function Rule:Stop(_context) end

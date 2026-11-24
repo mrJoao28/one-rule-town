@@ -131,6 +131,38 @@ local ruleLabel = textLabel(ruleCard, "Rule", "ONE RULE TOWN", UDim2.fromOffset(
 local descriptionLabel = textLabel(ruleCard, "Description", "Every round, the town makes one absurd rule.", UDim2.fromOffset(480, 32), UDim2.fromOffset(60, 88), Enum.Font.GothamMedium, Color3.new(1, 1, 1))
 local timerLabel = textLabel(ruleCard, "Timer", "--", UDim2.fromOffset(75, 55), UDim2.fromOffset(510, 87), Enum.Font.GothamBlack, COLORS.Yellow)
 
+local dangerPanel = Instance.new("Frame")
+dangerPanel.Name = "RuleDanger"
+dangerPanel.AnchorPoint = Vector2.new(0.5, 0)
+dangerPanel.Position = UDim2.new(0.5, 0, 0, 182)
+dangerPanel.Size = UDim2.fromOffset(360, 46)
+dangerPanel.BackgroundColor3 = COLORS.Dark
+dangerPanel.Visible = false
+dangerPanel.Parent = gui
+corner(dangerPanel, 10)
+textLabel(dangerPanel, "Warning", "RULE DANGER — GET SAFE!", UDim2.new(1, -20, 0, 22), UDim2.fromOffset(10, 2), Enum.Font.GothamBlack, COLORS.Cream)
+local dangerTrack = Instance.new("Frame")
+dangerTrack.Name = "Track"
+dangerTrack.Position = UDim2.fromOffset(10, 29)
+dangerTrack.Size = UDim2.new(1, -20, 0, 9)
+dangerTrack.BackgroundColor3 = COLORS.Panel
+dangerTrack.Parent = dangerPanel
+corner(dangerTrack, 5)
+local dangerFill = Instance.new("Frame")
+dangerFill.Name = "Fill"
+dangerFill.Size = UDim2.fromScale(0, 1)
+dangerFill.BackgroundColor3 = COLORS.Red
+dangerFill.Parent = dangerTrack
+corner(dangerFill, 5)
+
+local function updateDanger(progress)
+	local visible = currentState.State == "Active" and player:GetAttribute("AliveInRound") == true and progress > 0
+	dangerPanel.Visible = visible
+	if visible then
+		dangerFill.Size = UDim2.fromScale(math.clamp(progress, 0, 1), 1)
+	end
+end
+
 local aliveBadge = Instance.new("Frame")
 aliveBadge.Size = UDim2.fromOffset(180, 50)
 aliveBadge.Position = UDim2.fromOffset(25, 25)
@@ -174,11 +206,12 @@ end
 local menuBar = Instance.new("Frame")
 menuBar.AnchorPoint = Vector2.new(0.5, 1)
 menuBar.Position = UDim2.new(0.5, 0, 1 / scale.Scale, -22)
-menuBar.Size = UDim2.fromOffset(380, 62)
+menuBar.Size = UDim2.fromOffset(420, 62)
 menuBar.BackgroundTransparency = 1
 menuBar.Parent = gui
-local shopButton = button(menuBar, "Shop", "SHOP", UDim2.fromOffset(180, 58), UDim2.fromOffset(0, 0), COLORS.Blue)
-local cosmeticsButton = button(menuBar, "Cosmetics", "COSMETICS", UDim2.fromOffset(180, 58), UDim2.fromOffset(200, 0), Color3.fromRGB(168, 91, 230))
+local shopButton = button(menuBar, "Shop", "SHOP", UDim2.fromOffset(110, 58), UDim2.fromOffset(0, 0), COLORS.Blue)
+local cosmeticsButton = button(menuBar, "Cosmetics", "COSMETICS", UDim2.fromOffset(170, 58), UDim2.fromOffset(120, 0), Color3.fromRGB(168, 91, 230))
+local helpButton = button(menuBar, "Help", "HOW TO PLAY", UDim2.fromOffset(120, 58), UDim2.fromOffset(300, 0), COLORS.Green)
 
 local function makeModal(name, titleText)
 	local panel = Instance.new("Frame")
@@ -200,11 +233,15 @@ local function makeModal(name, titleText)
 end
 
 local shopPanel = makeModal("ShopPanel", "TOWN SHOP")
-local shopContent = Instance.new("Frame")
+local shopContent = Instance.new("ScrollingFrame")
 shopContent.Name = "Items"
 shopContent.Position = UDim2.fromOffset(24, 78)
 shopContent.Size = UDim2.new(1, -48, 1, -100)
 shopContent.BackgroundTransparency = 1
+shopContent.BorderSizePixel = 0
+shopContent.ScrollBarThickness = 6
+shopContent.AutomaticCanvasSize = Enum.AutomaticSize.Y
+shopContent.CanvasSize = UDim2.new()
 shopContent.ZIndex = 31
 shopContent.Parent = shopPanel
 local shopList = Instance.new("UIListLayout")
@@ -234,6 +271,11 @@ shopItem("VIP COSMETICS PASS", "Pass", "VIP", Config.Monetization.GamePasses.VIP
 shopItem("DOUBLE TOKENS PASS", "Pass", "DoubleTokens", Config.Monetization.GamePasses.DoubleTokens > 0)
 
 local cosmeticsPanel = makeModal("CosmeticsPanel", "COSMETICS")
+local helpPanel = makeModal("HelpPanel", "HOW TO PLAY")
+textLabel(helpPanel, "Steps", "1  READ the town rule before the round begins.\n\n2  FOLLOW it until the timer ends. The red danger bar shows when you are close to breaking a timed rule.\n\n3  SURVIVE to earn Town Tokens. Play solo or team up with friends and town residents.\n\nFind the blue court for HUSS HUSS!", UDim2.new(1, -60, 1, -120), UDim2.fromOffset(30, 85), Enum.Font.GothamMedium, COLORS.Cream).ZIndex = 31
+local helpOkay = button(helpPanel, "GotIt", "GOT IT!", UDim2.fromOffset(180, 50), UDim2.new(0.5, -90, 1, -67), COLORS.Green)
+helpOkay.ZIndex = 32
+helpOkay.Activated:Connect(function() helpPanel.Visible = false end)
 local cosmeticScroll = Instance.new("ScrollingFrame")
 cosmeticScroll.Name = "Items"
 cosmeticScroll.Position = UDim2.fromOffset(24, 78)
@@ -292,10 +334,17 @@ buyReviveButton.Activated:Connect(function() purchaseRemote:FireServer("Product"
 shopButton.Activated:Connect(function()
 	shopPanel.Visible = not shopPanel.Visible
 	cosmeticsPanel.Visible = false
+	helpPanel.Visible = false
 end)
 cosmeticsButton.Activated:Connect(function()
 	cosmeticsPanel.Visible = not cosmeticsPanel.Visible
 	shopPanel.Visible = false
+	helpPanel.Visible = false
+end)
+helpButton.Activated:Connect(function()
+	helpPanel.Visible = not helpPanel.Visible
+	shopPanel.Visible = false
+	cosmeticsPanel.Visible = false
 end)
 
 local function updateCosmetics()
@@ -345,7 +394,14 @@ local function updateRevive()
 end
 
 local function applyState(payload)
+	local previousState = currentState.State
 	for key, value in pairs(payload) do currentState[key] = value end
+	if currentState.State ~= "Active" then updateDanger(0) end
+	if previousState ~= currentState.State and currentState.State == "RuleReveal" then
+		helpPanel.Visible = false
+		shopPanel.Visible = false
+		cosmeticsPanel.Visible = false
+	end
 	stateLabel.Text = STATE_TEXT[currentState.State] or string.upper(tostring(currentState.State))
 	timerLabel.Text = currentState.TimeLeft and tostring(currentState.TimeLeft) or "--"
 	aliveLabel.Text = tostring(currentState.AliveCount or 0) .. " ALIVE"
@@ -402,7 +458,10 @@ gameStateRemote.OnClientEvent:Connect(function(payload)
 end)
 
 playerStateRemote.OnClientEvent:Connect(function(payload)
-	if payload.Type == "Eliminated" then
+	if payload.Type == "Danger" then
+		updateDanger(payload.Progress or 0)
+	elseif payload.Type == "Eliminated" then
+		updateDanger(0)
 		currentState.AliveCount = payload.AliveCount or currentState.AliveCount
 		aliveLabel.Text = tostring(currentState.AliveCount) .. " ALIVE"
 		if payload.UserId == player.UserId then
@@ -432,6 +491,7 @@ dataRemote.OnClientEvent:Connect(applyData)
 player:GetAttributeChangedSignal("AliveInRound"):Connect(function()
 	currentState.IsAlive = player:GetAttribute("AliveInRound") == true
 	if currentState.IsAlive then currentState.CanRevive = false end
+	if not currentState.IsAlive then updateDanger(0) end
 	updateRevive()
 end)
 
@@ -440,6 +500,9 @@ task.spawn(function()
 	if success and snapshot then
 		applyState(snapshot)
 		applyData(snapshot.Data)
+		if snapshot.State == "Intermission" or snapshot.State == "WaitingForPlayers" then
+			helpPanel.Visible = true
+		end
 	end
 end)
 

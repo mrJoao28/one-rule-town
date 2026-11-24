@@ -15,13 +15,13 @@ function Rule:CheckPlayer(player, _context)
 	local id = player.UserId
 	if Utils.HorizontalDistance(root.Position, COURT_CENTER) <= 17 then
 		self.OutsideSince[id] = nil
-		return false
+		return false, nil, 0
 	end
 	self.OutsideSince[id] = self.OutsideSince[id] or os.clock()
 	if os.clock() - self.OutsideSince[id] >= 12 then
 		return true, "You missed the HUSS HUSS court."
 	end
-	return false
+	return false, nil, (os.clock() - self.OutsideSince[id]) / 12
 end
 
 function Rule:Stop(_context) end

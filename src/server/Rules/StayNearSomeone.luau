@@ -12,7 +12,7 @@ function Rule:CheckPlayer(player, context)
 	local players = context.GetAlivePlayers()
 	if #players <= 1 and not context.CrowdService then
 		self.AloneSince[player.UserId] = nil
-		return false
+		return false, nil, 0
 	end
 	local root = Utils.GetRoot(player)
 	if not root then return false end
@@ -27,13 +27,13 @@ function Rule:CheckPlayer(player, context)
 	end
 	if nearest <= 18 then
 		self.AloneSince[player.UserId] = nil
-		return false
+		return false, nil, 0
 	end
 	self.AloneSince[player.UserId] = self.AloneSince[player.UserId] or os.clock()
 	if os.clock() - self.AloneSince[player.UserId] >= 4 then
 		return true, "You were alone for too long."
 	end
-	return false
+	return false, nil, (os.clock() - self.AloneSince[player.UserId]) / 4
 end
 
 function Rule:Stop(_context) end

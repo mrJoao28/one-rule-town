@@ -17,13 +17,13 @@ function Rule:CheckPlayer(player, _context)
 	self.LastPositions[id] = root.Position
 	if not previous or Utils.HorizontalDistance(previous, root.Position) >= 0.35 then
 		self.StationarySince[id] = nil
-		return false
+		return false, nil, 0
 	end
 	self.StationarySince[id] = self.StationarySince[id] or os.clock()
 	if os.clock() - self.StationarySince[id] >= 2.5 then
 		return true, "You stopped moving."
 	end
-	return false
+	return false, nil, (os.clock() - self.StationarySince[id]) / 2.5
 end
 
 function Rule:Stop(_context) end
