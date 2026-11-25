@@ -56,6 +56,36 @@ local RuleCatalog = {
 		Description = "Find high ground before the street heats up.",
 		Accent = Color3.fromRGB(255, 111, 42),
 	},
+	AvoidTheCourt = {
+		DisplayName = "THE BLUE COURT IS CLOSED",
+		Description = "Stay away from the blue court. The Mayor changed his mind.",
+		Accent = Color3.fromRGB(76, 164, 255),
+		Difficulty = 2,
+	},
+	FindTheYellowSpot = {
+		DisplayName = "FIND THE YELLOW SPOT",
+		Description = "Touch the yellow market marker in twelve seconds.",
+		Accent = Color3.fromRGB(255, 216, 72),
+		Difficulty = 1,
+	},
+	AvoidTheCenter = {
+		DisplayName = "AVOID THE TOWN CENTER",
+		Description = "The tower is watching. Leave the center quickly.",
+		Accent = Color3.fromRGB(231, 102, 99),
+		Difficulty = 2,
+	},
+	StayOnSidewalk = {
+		DisplayName = "STAY ON THE PAVEMENT",
+		Description = "The road belongs to the Mayor. Find a sidewalk.",
+		Accent = Color3.fromRGB(190, 211, 192),
+		Difficulty = 3,
+	},
+	CrossTheStreet = {
+		DisplayName = "CROSS THE TOWN",
+		Description = "Reach the opposite side of the main street in fifteen seconds.",
+		Accent = Color3.fromRGB(110, 227, 187),
+		Difficulty = 3,
+	},
 }
 
 return table.freeze(RuleCatalog)

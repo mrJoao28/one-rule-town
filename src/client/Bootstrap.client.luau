@@ -9,6 +9,7 @@ local UserInputService = game:GetService("UserInputService")
 local player = Players.LocalPlayer
 local Config = require(ReplicatedStorage.Shared.Config)
 local RuleCatalog = require(ReplicatedStorage.Shared.RuleCatalog)
+local MapCatalog = require(ReplicatedStorage.Shared.MapCatalog)
 local remotes = ReplicatedStorage:WaitForChild("Remotes")
 local gameStateRemote = remotes:WaitForChild("GameState")
 local playerStateRemote = remotes:WaitForChild("PlayerState")
@@ -16,6 +17,7 @@ local dataRemote = remotes:WaitForChild("DataUpdated")
 local purchaseRemote = remotes:WaitForChild("PurchaseRequest")
 local cosmeticRemote = remotes:WaitForChild("CosmeticAction")
 local useReviveRemote = remotes:WaitForChild("UseRevive")
+local voteRemote = remotes:WaitForChild("VoteMap")
 local getSnapshot = remotes:WaitForChild("GetSnapshot")
 
 local COLORS = {
@@ -156,6 +158,15 @@ dangerFill.BackgroundColor3 = COLORS.Red
 dangerFill.Parent = dangerTrack
 corner(dangerFill, 5)
 
+local hunterBadge = textLabel(gui, "HunterStatus", "YOU ARE A TOWN HUNTER · TAG SURVIVORS", UDim2.new(0.8, 0, 0, 48), UDim2.new(0.1, 0, 0, 240), Enum.Font.GothamBlack, COLORS.Yellow)
+hunterBadge.BackgroundColor3 = COLORS.Red
+hunterBadge.BackgroundTransparency = 0.12
+hunterBadge.Visible = false
+corner(hunterBadge, 10)
+local function updateHunter()
+	hunterBadge.Visible = currentState.State == "Active" and player:GetAttribute("TownHunter") == true
+end
+
 local function updateDanger(progress)
 	local visible = currentState.State == "Active" and player:GetAttribute("AliveInRound") == true and progress > 0
 	dangerPanel.Visible = visible
@@ -217,6 +228,41 @@ local shopButton = button(menuBar, "Shop", "SHOP", UDim2.new(0.2, -4, 0, 58), UD
 local cosmeticsButton = button(menuBar, "Cosmetics", "COSMETICS", UDim2.new(0.31, -4, 0, 58), UDim2.new(0.21, 0, 0, 0), Color3.fromRGB(168, 91, 230))
 local helpButton = button(menuBar, "Help", "HOW TO PLAY", UDim2.new(0.23, -4, 0, 58), UDim2.new(0.53, 0, 0, 0), COLORS.Green)
 local introButton = button(menuBar, "ReplayIntro", "REPLAY INTRO", UDim2.new(0.23, -4, 0, 58), UDim2.new(0.77, 0, 0, 0), COLORS.Yellow)
+
+local votePanel = Instance.new("Frame")
+votePanel.Name = "MapVote"
+votePanel.AnchorPoint = Vector2.new(0.5, 0)
+votePanel.Position = UDim2.new(0.5, 0, 0, 240)
+votePanel.Size = UDim2.new(0.9, 0, 0, 125)
+votePanel.BackgroundColor3 = COLORS.Dark
+votePanel.Visible = false
+votePanel.Parent = gui
+corner(votePanel, 12)
+local voteLimit = Instance.new("UISizeConstraint")
+voteLimit.MaxSize = Vector2.new(650, 125)
+voteLimit.Parent = votePanel
+textLabel(votePanel, "Title", "VOTE FOR THE NEXT CITY", UDim2.new(1, -12, 0, 32), UDim2.fromOffset(6, 3), Enum.Font.GothamBlack, COLORS.Yellow)
+local voteButtons = {}
+local voteCounts = {}
+local selectedVote = nil
+local function updateVotes()
+	votePanel.Visible = currentState.State == "Intermission"
+	for id, map in MapCatalog do
+		local entry = voteButtons[id]
+		entry.Text = map.Name .. "\n" .. tostring(voteCounts[id] or 0) .. " VOTES"
+		entry.BackgroundColor3 = if selectedVote == id then COLORS.Green else COLORS.Blue
+	end
+end
+for id in MapCatalog do
+	local entry = button(votePanel, "Map" .. id, "", UDim2.new(0.31, -4, 0, 75), UDim2.new((id - 1) / 3 + 0.015, 0, 0, 39), COLORS.Blue)
+	entry.Activated:Connect(function()
+		if currentState.State ~= "Intermission" then return end
+		selectedVote = id
+		updateVotes()
+		voteRemote:FireServer(id)
+	end)
+	voteButtons[id] = entry
+end
 
 local function makeModal(name, titleText)
 	local panel = Instance.new("Frame")
@@ -432,6 +478,16 @@ end
 local function applyState(payload)
 	local previousState = currentState.State
 	for key, value in pairs(payload) do currentState[key] = value end
+	if previousState ~= currentState.State and currentState.State == "Intermission" then
+		selectedVote = nil
+		voteCounts = {}
+	end
+	if payload.Voting then
+		voteCounts = payload.Voting.Counts or {}
+		selectedVote = payload.Voting.OwnVote
+	end
+	updateVotes()
+	updateHunter()
 	if currentState.State ~= "Active" then updateDanger(0) end
 	if previousState ~= currentState.State and currentState.State == "RuleReveal" then
 		helpPanel.Visible = false
@@ -439,6 +495,9 @@ local function applyState(payload)
 		cosmeticsPanel.Visible = false
 	end
 	stateLabel.Text = STATE_TEXT[currentState.State] or string.upper(tostring(currentState.State))
+	if currentState.SpecialRound and currentState.State == "Active" then
+		stateLabel.Text = "SPECIAL ROUND · 2X TOKENS"
+	end
 	timerLabel.Text = currentState.TimeLeft and tostring(currentState.TimeLeft) or "--"
 	aliveLabel.Text = tostring(currentState.AliveCount or 0) .. " ALIVE"
 
@@ -479,6 +538,9 @@ end
 gameStateRemote.OnClientEvent:Connect(function(payload)
 	if payload.Type == "State" then
 		applyState(payload)
+	elseif payload.Type == "MapVote" then
+		voteCounts = payload.Counts or {}
+		updateVotes()
 	elseif payload.Type == "Effect" then
 		if payload.Effect == "Bell" then
 			notify("🔔 FREEZE!", COLORS.Yellow, 2.3)
@@ -489,6 +551,10 @@ gameStateRemote.OnClientEvent:Connect(function(payload)
 			notify("THE FLOOR HEATS UP IN 8 SECONDS", Color3.fromRGB(255, 130, 48), 3)
 		elseif payload.Effect == "LavaActive" then
 			notify("THE FLOOR IS LAVA!", Color3.fromRGB(255, 90, 35), 2)
+		elseif payload.Effect == "TownSprint" then
+			notify("MINI EVENT: THE TOWN IS SPRINTING!", COLORS.Green, 3)
+		elseif payload.Effect == "TokenShower" then
+			notify("MINI EVENT: COLLECT THE GOLD TOKENS!", COLORS.Yellow, 3)
 		end
 	end
 end)
@@ -506,6 +572,11 @@ playerStateRemote.OnClientEvent:Connect(function(payload)
 			currentState.IsAlive = false
 			currentState.CanRevive = currentState.TimeLeft > Config.ReviveCutoffSeconds
 			notify("RULE BROKEN!\n" .. payload.Reason, COLORS.Red, 3.5)
+			task.delay(3.5, function()
+				if player:GetAttribute("TownHunter") and currentState.State == "Active" then
+					notify("JOIN THE MAYOR! TAG SURVIVORS FOR TOKENS", COLORS.Yellow, 3)
+				end
+			end)
 			vignette.BackgroundColor3 = COLORS.Red
 			vignette.BackgroundTransparency = 0.65
 			TweenService:Create(vignette, TweenInfo.new(0.8), { BackgroundTransparency = 1 }):Play()
@@ -522,6 +593,8 @@ playerStateRemote.OnClientEvent:Connect(function(payload)
 		else
 			notify(payload.Name .. " RETURNED", COLORS.Green, 1.5)
 		end
+	elseif payload.Type == "HunterTag" then
+		notify(payload.Name .. " TAGGED " .. payload.Target, COLORS.Yellow, 1.5)
 	end
 end)
 
@@ -532,6 +605,7 @@ player:GetAttributeChangedSignal("AliveInRound"):Connect(function()
 	if not currentState.IsAlive then updateDanger(0) end
 	updateRevive()
 end)
+player:GetAttributeChangedSignal("TownHunter"):Connect(updateHunter)
 
 task.spawn(function()
 	local success, snapshot = pcall(function() return getSnapshot:InvokeServer() end)

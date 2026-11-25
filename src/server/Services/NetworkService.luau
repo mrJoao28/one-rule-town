@@ -11,6 +11,7 @@ local remoteNames = {
 	"PurchaseRequest",
 	"CosmeticAction",
 	"UseRevive",
+	"VoteMap",
 }
 
 function NetworkService:Initialize()

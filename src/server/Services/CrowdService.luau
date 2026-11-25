@@ -42,7 +42,7 @@ function CrowdService:Initialize(mapService)
 	self.Connection = RunService.Heartbeat:Connect(function(delta)
 		self.Elapsed += delta
 		self.UpdateElapsed += delta
-		if self.UpdateElapsed < 1 / 20 then return end
+		if self.UpdateElapsed < 1 / 10 then return end
 		self.UpdateElapsed = 0
 		for index, resident in self.Residents do
 			local angle = self.Elapsed * resident.Speed + index * (math.pi * 2 / math.max(1, #self.Residents))

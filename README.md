@@ -2,15 +2,15 @@
 
 Every round, the town announces one absurd rule. Read it, follow it, and survive.
 
-One Rule Town is a server-authoritative Roblox party game built with Luau and Rojo. The repository contains a complete code-generated MVP: the town map, ten survival rules, round flow, persistent progression, cosmetics, responsive UI, and secure monetization hooks.
+One Rule Town is a server-authoritative Roblox party game built with Luau and Rojo. The repository contains a code-generated MVP: three themed town maps, sixteen survival rules, round flow, persistent progression, cosmetics, responsive UI, and monetization hooks.
 
 ## MVP features
 
-- Two rotating town layouts, Sunny Square and Festival Night, with distinct lighting and landmarks while preserving the tagged rule zones.
+- Three voteable town layouts, Sunny Square, Festival Night, and Market Rush, with distinct lighting and landmarks while preserving the rule zones.
 - An original 11-second opening with a resident watching a HUSS HUSS phone clip, the Mayor, a town flyover, asset loading, Skip after two seconds, Replay Intro, and automatic camera/control restoration.
 - Code-generated town with an entry gate, shopfronts, token sculptures, safe platforms, light zones, and a spectator roof.
-- Eleven modular rules with server-side validation.
-- Intermission, rule reveal, active round, elimination, revive, results, and reward states.
+- Sixteen modular rules with server-side validation and escalating difficulty.
+- Intermission with map voting, rule reveal, active round, playable hunter role after elimination, revive, mini events, special double-token rounds, results, and reward states.
 - Town Tokens, wins, streaks, a daily first-win bonus, persistent cosmetics, and leaderstats.
 - Expressive resident NPCs with accessories, dance moves, and short speech bubbles; NPCs do not count as real visits.
 - Developer product receipt processing with persisted purchase IDs.
@@ -31,6 +31,11 @@ One Rule Town is a server-authoritative Roblox party game built with Luau and Ro
 9. Avoid The Mayor
 10. The Floor Is Lava
 11. HUSS HUSS! Reach the Court
+12. The Blue Court Is Closed
+13. Find the Yellow Spot
+14. Avoid the Town Center
+15. Stay on the Pavement
+16. Cross the Town
 
 ## Open in Roblox Studio
 

@@ -6,6 +6,7 @@ local Config = {
 	MaximumPlayers = 12,
 	TargetTownPopulation = 6,
 	IntermissionDuration = 8,
+	FirstIntermissionDuration = 18,
 	RuleRevealDuration = 6,
 	RoundDuration = 45,
 	ResultsDuration = 7,

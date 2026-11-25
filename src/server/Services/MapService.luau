@@ -4,6 +4,7 @@ local CollectionService = game:GetService("CollectionService")
 local Lighting = game:GetService("Lighting")
 local Workspace = game:GetService("Workspace")
 local CharacterVisual = require(script.Parent.CharacterVisual)
+local MapCatalog = require(game:GetService("ReplicatedStorage").Shared.MapCatalog)
 
 local MapService = {}
 
@@ -108,8 +109,10 @@ end
 local function decorateTown(parent: Instance, layoutId: number)
 	-- A coherent street layout provides visual anchors in every short video clip.
 	for _, side in { -1, 1 } do
-		part(parent, "Sidewalk", Vector3.new(7, 0.5, 180), CFrame.new(side * 19, 0.55, 0), COLORS.Sidewalk, Enum.Material.Pavement)
-		part(parent, "Sidewalk", Vector3.new(180, 0.5, 7), CFrame.new(0, 0.55, side * 19), COLORS.Sidewalk, Enum.Material.Pavement)
+		local northWalk = part(parent, "Sidewalk", Vector3.new(7, 0.5, 180), CFrame.new(side * 19, 0.55, 0), COLORS.Sidewalk, Enum.Material.Pavement)
+		local eastWalk = part(parent, "Sidewalk", Vector3.new(180, 0.5, 7), CFrame.new(0, 0.55, side * 19), COLORS.Sidewalk, Enum.Material.Pavement)
+		CollectionService:AddTag(northWalk, "SafePavement")
+		CollectionService:AddTag(eastWalk, "SafePavement")
 		for index = -3, 3 do
 			local z = index * 24
 			local pole = part(parent, "StreetLamp", Vector3.new(0.6, 14, 0.6), CFrame.new(side * 22, 7.5, z), Color3.fromRGB(54, 64, 81), Enum.Material.Metal)
@@ -151,6 +154,7 @@ local function decorateTown(parent: Instance, layoutId: number)
 		token.CanCollide = false
 	end
 	local court = part(parent, "HussTrainingCourt", Vector3.new(30, 0.5, 24), CFrame.new(-58, 0.3, 0), Color3.fromRGB(62, 135, 205), Enum.Material.SmoothPlastic)
+	CollectionService:AddTag(court, "HussCourt")
 	part(parent, "CourtCenter", Vector3.new(0.4, 0.06, 22), CFrame.new(-58, 0.59, 0), COLORS.Cream, Enum.Material.Neon)
 	addBillboard(court, "HUSS HUSS TRAINING", COLORS.Yellow)
 	for _, x in { -71, -45 } do
@@ -163,7 +167,25 @@ local function decorateTown(parent: Instance, layoutId: number)
 		part(parent, "ParkBenchSeat", Vector3.new(7, 0.5, 2), CFrame.new(position + Vector3.new(0, 1.7, 0)), Color3.fromRGB(139, 81, 55), Enum.Material.Wood)
 		part(parent, "ParkBenchBack", Vector3.new(7, 2, 0.4), CFrame.new(position + Vector3.new(0, 2.6, 1)), Color3.fromRGB(139, 81, 55), Enum.Material.Wood)
 	end
-	if layoutId == 2 then
+	if layoutId == 3 then
+		-- Low part count market stalls create a different silhouette without blocking rules.
+		for _, location in {
+			Vector3.new(-72, 0, -46), Vector3.new(72, 0, -46),
+			Vector3.new(-72, 0, 46), Vector3.new(72, 0, 46),
+			Vector3.new(-45, 0, -73), Vector3.new(45, 0, 73),
+		} do
+			local stall = part(parent, "MarketCounter", Vector3.new(13, 3, 7), CFrame.new(location + Vector3.new(0, 2, 0)), Color3.fromRGB(124, 75, 53), Enum.Material.Wood)
+			part(parent, "MarketCanopy", Vector3.new(15, 0.8, 9), CFrame.new(location + Vector3.new(0, 7, 0)), Color3.fromRGB(60, 200, 165), Enum.Material.Fabric)
+			addBillboard(stall, "MARKET RUSH", COLORS.Yellow)
+		end
+		for _, location in {
+			Vector3.new(-32, 0, -62), Vector3.new(32, 0, 62),
+			Vector3.new(60, 0, 30), Vector3.new(-60, 0, -30),
+		} do
+			local crate = part(parent, "MarketCrate", Vector3.new(6, 4, 6), CFrame.new(location + Vector3.new(0, 2, 0)), Color3.fromRGB(174, 110, 69), Enum.Material.Wood)
+			CollectionService:AddTag(crate, "FloorIsLavaSafe")
+		end
+	elseif layoutId == 2 then
 		-- Festival Night uses overhead ribbons and lit kiosks without changing the rule geometry.
 		for _, z in { -68, -44, 44, 68 } do
 			local ribbon = part(parent, "FestivalRibbon", Vector3.new(43, 0.35, 0.7), CFrame.new(0, 16, z), Color3.fromRGB(177, 92, 235), Enum.Material.Neon)
@@ -253,13 +275,11 @@ end
 function MapService:Initialize(layoutId: number?)
 	createIntroSet()
 	self.LayoutId = layoutId or 1
-	self.MapName = if self.LayoutId == 2 then "Festival Night" else "Sunny Square"
+	assert(MapCatalog[self.LayoutId], "Unknown map layout")
+	self.MapName = MapCatalog[self.LayoutId].Name
 	local old = Workspace:FindFirstChild(MAP_NAME)
-	if old then
-		old:Destroy()
-	end
 
-	Lighting.ClockTime = if self.LayoutId == 2 then 19 else 14
+	Lighting.ClockTime = if self.LayoutId == 2 then 19 else if self.LayoutId == 3 then 16 else 14
 	Lighting.Brightness = 2.5
 	Lighting.Ambient = Color3.fromRGB(128, 137, 155)
 	Lighting.OutdoorAmbient = Color3.fromRGB(155, 165, 180)
@@ -272,17 +292,17 @@ function MapService:Initialize(layoutId: number?)
 	local atmosphere = Lighting:FindFirstChildOfClass("Atmosphere") or Instance.new("Atmosphere")
 	atmosphere.Density = 0.25
 	atmosphere.Haze = 1
-	atmosphere.Color = if self.LayoutId == 2 then Color3.fromRGB(153, 164, 218) else Color3.fromRGB(212, 231, 255)
+	atmosphere.Color = if self.LayoutId == 2 then Color3.fromRGB(153, 164, 218) else if self.LayoutId == 3 then Color3.fromRGB(255, 214, 171) else Color3.fromRGB(212, 231, 255)
 	atmosphere.Parent = Lighting
 	local colorCorrection = Lighting:FindFirstChild("TownColor") or Instance.new("ColorCorrectionEffect")
 	colorCorrection.Name = "TownColor"
 	colorCorrection.Contrast = 0.12
 	colorCorrection.Saturation = 0.12
-	colorCorrection.TintColor = if self.LayoutId == 2 then Color3.fromRGB(194, 189, 255) else Color3.fromRGB(255, 243, 226)
+	colorCorrection.TintColor = if self.LayoutId == 2 then Color3.fromRGB(194, 189, 255) else if self.LayoutId == 3 then Color3.fromRGB(255, 228, 198) else Color3.fromRGB(255, 243, 226)
 	colorCorrection.Parent = Lighting
 
 	local map = Instance.new("Model")
-	map.Name = MAP_NAME
+	map.Name = if old then MAP_NAME .. "Next" else MAP_NAME
 	map.Parent = Workspace
 	self.Map = map
 
@@ -303,7 +323,11 @@ function MapService:Initialize(layoutId: number?)
 	CollectionService:AddTag(roadB, "TownFloor")
 	decorateTown(environment, self.LayoutId)
 
-	part(environment, "Square", Vector3.new(38, 1.2, 38), CFrame.new(0, 0.65, 0), COLORS.Cream, Enum.Material.Pavement)
+	local square = part(environment, "Square", Vector3.new(38, 1.2, 38), CFrame.new(0, 0.65, 0), COLORS.Cream, Enum.Material.Pavement)
+	CollectionService:AddTag(square, "SafePavement")
+	local yellowSpot = part(environment, "YellowSpot", Vector3.new(19, 0.3, 19), CFrame.new(58, 0.77, 0), COLORS.Yellow, Enum.Material.Neon)
+	CollectionService:AddTag(yellowSpot, "YellowSpot")
+	addBillboard(yellowSpot, "YELLOW SPOT", COLORS.Yellow)
 
 	for index = -3, 3 do
 		local stripeA = part(environment, "RedCrossing", Vector3.new(2.5, 0.25, 10), CFrame.new(index * 4, 0.75, 20), COLORS.Red)
@@ -363,6 +387,7 @@ function MapService:Initialize(layoutId: number?)
 	addBillboard(spectator, "SPECTATORS", Color3.fromRGB(255, 255, 255))
 	self.SpectatorPosition = spectator.Position + Vector3.new(0, 4, 0)
 	self.LobbyPosition = Vector3.new(0, 4, -12)
+	self.HunterPosition = Vector3.new(0, 4, 76)
 
 	local spawnLocation = Instance.new("SpawnLocation")
 	spawnLocation.Name = "LobbySpawn"
@@ -389,6 +414,8 @@ function MapService:Initialize(layoutId: number?)
 
 	self.LavaVisualParts = { ground, roadA, roadB }
 	self:SetLavaActive(false)
+	if old then old:Destroy() end
+	map.Name = MAP_NAME
 end
 
 function MapService:IsPointInsideTag(position: Vector3, tag: string): boolean

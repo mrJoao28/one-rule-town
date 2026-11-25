@@ -1,6 +1,8 @@
 --!nonstrict
 
 local RuleService = {}
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RuleCatalog = require(ReplicatedStorage.Shared.RuleCatalog)
 
 function RuleService:Initialize()
 	self.Rules = {}
@@ -18,18 +20,25 @@ function RuleService:Initialize()
 	end
 end
 
-function RuleService:ChooseRule()
+function RuleService:ChooseRule(featuredRuleId, roundNumber)
+	local allowedDifficulty = if roundNumber <= 2 then 1 else if roundNumber <= 5 then 2 else 3
 	local candidates = {}
 	for id in pairs(self.Rules) do
-		if not table.find(self.History, id) then
+		local info = RuleCatalog[id]
+		if info and (info.Difficulty or 1) <= allowedDifficulty and not table.find(self.History, id) then
 			table.insert(candidates, id)
 		end
 	end
 	if #candidates == 0 then
 		self.History = {}
-		for id in pairs(self.Rules) do table.insert(candidates, id) end
+		for id in pairs(self.Rules) do
+			local info = RuleCatalog[id]
+			if info and (info.Difficulty or 1) <= allowedDifficulty then table.insert(candidates, id) end
+		end
 	end
-	local id = candidates[math.random(1, #candidates)]
+	assert(#candidates > 0, "No eligible town rules")
+	local id = if featuredRuleId and table.find(candidates, featuredRuleId) and math.random() < 0.5
+		then featuredRuleId else candidates[math.random(1, #candidates)]
 	table.insert(self.History, id)
 	while #self.History > 3 do table.remove(self.History, 1) end
 	return id

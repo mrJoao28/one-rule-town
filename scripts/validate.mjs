@@ -16,7 +16,7 @@ const ruleFiles = fs.readdirSync(rulesDirectory)
 	.filter((file) => file.endsWith(".luau") && file !== "RuleUtils.luau")
 	.sort();
 
-assert.equal(ruleFiles.length, 11, "The game must ship with eleven rules");
+assert.ok(ruleFiles.length >= 15, "The game must ship with at least fifteen rules");
 
 const catalog = read("src/shared/RuleCatalog.luau");
 const ruleIds = [];
@@ -28,6 +28,14 @@ for (const file of ruleFiles) {
 	assert.ok(!ruleIds.includes(id), `Duplicate rule Id: ${id}`);
 	assert.match(catalog, new RegExp(`\\b${id}\\s*=`), `${id} must exist in RuleCatalog`);
 	ruleIds.push(id);
+}
+
+const mapCatalog = read("src/shared/MapCatalog.luau");
+const featuredRules = [...mapCatalog.matchAll(/FeaturedRule\s*=\s*"([A-Za-z0-9]+)"/g)]
+	.map((match) => match[1]);
+assert.equal(featuredRules.length, 3, "The game must offer three voteable cities");
+for (const id of featuredRules) {
+	assert.ok(ruleIds.includes(id), `Map features unknown rule: ${id}`);
 }
 
 for (const requiredFile of [

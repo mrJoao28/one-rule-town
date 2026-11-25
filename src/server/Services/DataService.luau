@@ -323,11 +323,12 @@ function DataService:SpendCoins(player, amount)
 	return true
 end
 
-function DataService:RecordRound(player, survived, soloSurvivor)
+function DataService:RecordRound(player, survived, soloSurvivor, specialRound)
 	local data = profiles[player.UserId]
 	if not data then
 		return
 	end
+	local roundMultiplier = if specialRound then 2 else 1
 	data.RoundsPlayed += 1
 	local firstWinToday = false
 	if survived then
@@ -336,7 +337,7 @@ function DataService:RecordRound(player, survived, soloSurvivor)
 		data.BestWinStreak = math.max(data.BestWinStreak, data.CurrentWinStreak)
 		self:AddCoins(
 			player,
-			Config.Rewards.Survival + (if soloSurvivor then Config.Rewards.SoloSurvivorBonus else 0),
+			(Config.Rewards.Survival + (if soloSurvivor then Config.Rewards.SoloSurvivorBonus else 0)) * roundMultiplier,
 			true
 		)
 		local today = os.date("!%Y-%m-%d")
@@ -348,7 +349,7 @@ function DataService:RecordRound(player, survived, soloSurvivor)
 	else
 		data.CurrentWinStreak = 0
 	end
-	self:AddCoins(player, Config.Rewards.Participation, true)
+	self:AddCoins(player, Config.Rewards.Participation * roundMultiplier, true)
 	self:Push(player)
 	return firstWinToday
 end
