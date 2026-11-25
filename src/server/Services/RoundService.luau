@@ -276,7 +276,10 @@ function RoundService:Start()
 			for _, player in survivors do table.insert(survivorNames, player.DisplayName) end
 			for player in pairs(self.Participants) do
 				if player.Parent == Players then
-					self.DataService:RecordRound(player, self.Alive[player] == true, #survivors == 1 and self.Alive[player] == true)
+					local firstWinToday = self.DataService:RecordRound(player, self.Alive[player] == true, #survivors == 1 and self.Alive[player] == true)
+					if firstWinToday then
+						self.PlayerState:FireClient(player, { Type = "DailyWin", Amount = Config.Rewards.FirstWinToday })
+					end
 				end
 			end
 

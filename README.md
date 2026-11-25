@@ -6,10 +6,11 @@ One Rule Town is a server-authoritative Roblox party game built with Luau and Ro
 
 ## MVP features
 
-- Code-generated low-poly town with a square, streets, shops, safe platforms, light zones, and a spectator roof.
-- Ten modular rules with server-side validation.
+- Code-generated town with an entry gate, shopfronts, token sculptures, safe platforms, light zones, and a spectator roof.
+- Eleven modular rules with server-side validation.
 - Intermission, rule reveal, active round, elimination, revive, results, and reward states.
-- Town Tokens, wins, streaks, persistent cosmetics, and leaderstats.
+- Town Tokens, wins, streaks, a daily first-win bonus, persistent cosmetics, and leaderstats.
+- Expressive resident NPCs with accessories, dance moves, and short speech bubbles; NPCs do not count as real visits.
 - Developer product receipt processing with persisted purchase IDs.
 - Game pass ownership checks for VIP and Double Tokens.
 - Responsive English UI for desktop, mobile, tablet, and console-sized screens.
@@ -27,6 +28,7 @@ One Rule Town is a server-authoritative Roblox party game built with Luau and Ro
 8. Hold Something Blue
 9. Avoid The Mayor
 10. The Floor Is Lava
+11. HUSS HUSS! Reach the Court
 
 ## Open in Roblox Studio
 

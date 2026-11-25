@@ -131,6 +131,23 @@ local function decorateTown(parent: Instance)
 		local board = part(parent, "TownNoticeBoard", Vector3.new(13, 9, 1), CFrame.new(position + Vector3.new(0, 5, 0)), Color3.fromRGB(37, 49, 69), Enum.Material.Wood)
 		addBillboard(board, "ONE RULE. SURVIVE.", COLORS.Yellow)
 	end
+	-- A visible entrance gives new players a landmark as soon as they spawn.
+	for _, side in { -1, 1 } do
+		part(parent, "TownGatePillar", Vector3.new(3, 17, 3), CFrame.new(side * 16, 8.5, -78), COLORS.Blue, Enum.Material.Brick)
+		local lamp = part(parent, "GateBeacon", Vector3.new(4, 4, 4), CFrame.new(side * 16, 18, -78), COLORS.Yellow, Enum.Material.Neon)
+		lamp.Shape = Enum.PartType.Ball
+		lamp.CanCollide = false
+	end
+	local gate = part(parent, "TownGate", Vector3.new(35, 3, 3), CFrame.new(0, 17, -78), Color3.fromRGB(30, 44, 72), Enum.Material.Metal)
+	addBillboard(gate, "WELCOME TO ONE RULE TOWN", COLORS.Yellow)
+	-- The small plaza props are outside the road and do not hide any rule zones.
+	for _, position in { Vector3.new(-31, 0, -8), Vector3.new(31, 0, 8), Vector3.new(-8, 0, 31), Vector3.new(8, 0, -31) } do
+		local pedestal = part(parent, "MemePedestal", Vector3.new(5, 2, 5), CFrame.new(position + Vector3.new(0, 1, 0)), COLORS.Blue, Enum.Material.Brick)
+		pedestal.CanCollide = true
+		local token = part(parent, "TownTokenSculpture", Vector3.new(3, 3, 0.65), CFrame.new(position + Vector3.new(0, 3.5, 0)) * CFrame.Angles(0, math.rad(35), 0), COLORS.Yellow, Enum.Material.Neon)
+		token.Shape = Enum.PartType.Cylinder
+		token.CanCollide = false
+	end
 	local court = part(parent, "HussTrainingCourt", Vector3.new(30, 0.5, 24), CFrame.new(-58, 0.3, 0), Color3.fromRGB(62, 135, 205), Enum.Material.SmoothPlastic)
 	part(parent, "CourtCenter", Vector3.new(0.4, 0.06, 22), CFrame.new(-58, 0.59, 0), COLORS.Cream, Enum.Material.Neon)
 	addBillboard(court, "HUSS HUSS TRAINING", COLORS.Yellow)

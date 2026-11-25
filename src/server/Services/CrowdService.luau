@@ -12,6 +12,7 @@ local palette = {
 	Color3.fromRGB(190, 134, 238),
 }
 local names = { "Milo", "Juno", "Pip", "Bea", "Nova", "Finn" }
+local chatter = { "ONE RULE!", "RUN!", "HUSS HUSS!", "NO WAY!", "I'M READY!", "WATCH OUT!" }
 
 local function limb(model, name, size, color, position)
 	local value = Instance.new("Part")
@@ -59,14 +60,23 @@ function CrowdService:Initialize(mapService)
 			resident.Torso.CFrame = facing * CFrame.new(0, 0.1 + math.abs(stride) * 0.12, 0)
 			resident.Head.CFrame = facing * CFrame.new(0, 2.1 + math.abs(stride) * 0.12, 0)
 			resident.Hair.CFrame = resident.Head.CFrame * CFrame.new(0, 0.68, 0)
+			resident.Hat.CFrame = resident.Head.CFrame * CFrame.new(0, 0.96, 0)
+			resident.HatBrim.CFrame = resident.Head.CFrame * CFrame.new(0, 0.73, -0.35)
 			resident.LeftEye.CFrame = resident.Head.CFrame * CFrame.new(-0.35, 0.12, -0.69)
 			resident.RightEye.CFrame = resident.Head.CFrame * CFrame.new(0.35, 0.12, -0.69)
+			resident.Smile.CFrame = resident.Head.CFrame * CFrame.new(0, -0.3, -0.71)
+			resident.Badge.CFrame = resident.Torso.CFrame * CFrame.new(0, 0.35, -0.55)
+			resident.Backpack.CFrame = resident.Torso.CFrame * CFrame.new(0, 0, 0.72)
 			resident.LeftArm.CFrame = facing * CFrame.new(-1.1, if index <= 2 then 1 + stride * 0.35 else 0.05, stride * 0.5)
 			resident.RightArm.CFrame = facing * CFrame.new(1.1, if index <= 2 then 1 - stride * 0.35 else 0.05, -stride * 0.5)
 			resident.LeftLeg.CFrame = facing * CFrame.new(-0.45, -1.65, -stride * 0.5)
 			resident.RightLeg.CFrame = facing * CFrame.new(0.45, -1.65, stride * 0.5)
 			resident.LeftShoe.CFrame = resident.LeftLeg.CFrame * CFrame.new(0, -0.8, -0.2)
 			resident.RightShoe.CFrame = resident.RightLeg.CFrame * CFrame.new(0, -0.8, -0.2)
+			local talking = math.floor(self.Elapsed / 7 + index * 0.7) % 3 == 0
+			if resident.Speech.Visible ~= talking then
+				resident.Speech.Visible = talking
+			end
 		end
 	end)
 	task.spawn(function()
@@ -87,8 +97,13 @@ function CrowdService:CreateResident(index)
 		Torso = limb(model, "Torso", Vector3.new(2, 2, 1), color, Vector3.zero),
 		Head = limb(model, "Head", Vector3.new(1.4, 1.4, 1.4), Color3.fromRGB(245, 207, 165), Vector3.zero),
 		Hair = limb(model, "Hair", Vector3.new(1.55, 0.5, 1.5), Color3.fromRGB(70, 48, 50), Vector3.zero),
+		Hat = limb(model, "Hat", Vector3.new(1.65, 0.55, 1.6), color:Lerp(Color3.new(0, 0, 0), 0.25), Vector3.zero),
+		HatBrim = limb(model, "HatBrim", Vector3.new(1.9, 0.15, 1.25), color, Vector3.zero),
 		LeftEye = limb(model, "LeftEye", Vector3.new(0.2, 0.26, 0.12), Color3.fromRGB(26, 35, 50), Vector3.zero),
 		RightEye = limb(model, "RightEye", Vector3.new(0.2, 0.26, 0.12), Color3.fromRGB(26, 35, 50), Vector3.zero),
+		Smile = limb(model, "Smile", Vector3.new(0.5, 0.12, 0.12), Color3.fromRGB(89, 42, 55), Vector3.zero),
+		Badge = limb(model, "Badge", Vector3.new(0.65, 0.65, 0.12), Color3.fromRGB(255, 221, 83), Vector3.zero),
+		Backpack = limb(model, "Backpack", Vector3.new(1.35, 1.4, 0.6), color:Lerp(Color3.new(0, 0, 0), 0.35), Vector3.zero),
 		LeftArm = limb(model, "LeftArm", Vector3.new(0.7, 1.8, 0.7), Color3.fromRGB(245, 207, 165), Vector3.zero),
 		RightArm = limb(model, "RightArm", Vector3.new(0.7, 1.8, 0.7), Color3.fromRGB(245, 207, 165), Vector3.zero),
 		LeftLeg = limb(model, "LeftLeg", Vector3.new(0.8, 1.7, 0.8), Color3.fromRGB(43, 52, 76), Vector3.zero),
@@ -115,6 +130,21 @@ function CrowdService:CreateResident(index)
 		label.TextScaled = true
 		label.Text = if index <= 2 then "HUSS HUSS! · NPC" else names[(index - 1) % #names + 1] .. " · NPC"
 		label.Parent = badge
+		local speech = Instance.new("TextLabel")
+		speech.Name = "Speech"
+		speech.Size = UDim2.fromOffset(130, 24)
+		speech.Position = UDim2.fromOffset(0, -26)
+		speech.BackgroundColor3 = color
+		speech.TextColor3 = Color3.fromRGB(22, 28, 43)
+		speech.Font = Enum.Font.GothamBlack
+		speech.TextScaled = true
+		speech.Text = chatter[(index - 1) % #chatter + 1]
+		speech.Visible = false
+		speech.Parent = badge
+		local speechCorner = Instance.new("UICorner")
+		speechCorner.CornerRadius = UDim.new(0, 8)
+		speechCorner.Parent = speech
+		resident.Speech = speech
 		local corner = Instance.new("UICorner")
 		corner.CornerRadius = UDim.new(0, 8)
 		corner.Parent = label

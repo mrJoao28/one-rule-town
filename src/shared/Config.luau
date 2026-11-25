@@ -5,10 +5,10 @@ local Config = {
 	MinimumPlayers = 1,
 	MaximumPlayers = 12,
 	TargetTownPopulation = 6,
-	IntermissionDuration = 15,
-	RuleRevealDuration = 5,
-	RoundDuration = 60,
-	ResultsDuration = 10,
+	IntermissionDuration = 8,
+	RuleRevealDuration = 6,
+	RoundDuration = 45,
+	ResultsDuration = 7,
 	RuleCheckInterval = 0.1,
 	ReviveCutoffSeconds = 10,
 	DataStoreName = "OneRuleTown_PlayerData_v1",
@@ -18,6 +18,7 @@ local Config = {
 		Participation = 5,
 		Survival = 25,
 		SoloSurvivorBonus = 50,
+		FirstWinToday = 50,
 	},
 
 	Monetization = {

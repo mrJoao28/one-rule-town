@@ -7,8 +7,9 @@ Reviewed November 24, 2026. Target: 100 total visits by Saturday, November 28, 2
 | [In This Town](https://www.roblox.com/games/108894291618002/In-This-Town) | A Mayor, a strong day/night split, five maps, twist cards and marked-player pursuit. | Make the Mayor recognizable and make each rule legible immediately. Keep our shorter, one-rule survival identity. |
 | [In This World](https://www.roblox.com/games/123545678366291/In-This-World) | Solo/friends play and escalating rules halfway through. | Solo play must work, and a short session should show a surprising rule quickly. |
 | [Disaster City](https://www.roblox.com/games/6669484102/Disaster-City) | Varied city, changing hazards, objectives. | Give the town distinct visual landmarks that players can describe and revisit. |
+| [Do It Or Die](https://www.roblox.com/games/133361008835544/Do-It-Or-Die) | Seven-second random tasks and immediate elimination. | Shorten downtime while keeping our one-rule objective easy to read. |
 
-The current build already includes 11 server-enforced rules, six resident NPCs when the server is empty, a blue HUSS HUSS court, cosmetic progression, four developer products and two passes. Residents fill out quiet servers; they are labeled NPCs and do not count as real visits. The live listing currently restricts access to users aged 16 and older. Creator Dashboard says access for younger players needs either 100 highly engaged players or a refundable 1,000 Robux publication fee. Do not pay the fee without a spending decision.
+The current build includes 11 server-enforced rules, resident NPCs on quiet servers, a blue HUSS HUSS court, cosmetic progression, four developer products and two passes. This update adds an entry gate and token landmarks, NPC expressions and chatter, shorter rounds, and a first-win-of-the-day reward. Residents are labeled NPCs and do not count as real visits. The live listing currently restricts access to users aged 16 and older. Creator Dashboard says access for younger players needs either 100 highly engaged players or a refundable 1,000 Robux publication fee. Do not pay the fee without a spending decision.
 
 ## Launch sequence
 

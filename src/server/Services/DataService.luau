@@ -16,6 +16,7 @@ local DEFAULT_DATA = {
 	RoundsPlayed = 0,
 	BestWinStreak = 0,
 	CurrentWinStreak = 0,
+	LastDailyWin = "",
 	ReviveCredits = 0,
 	OwnedCosmetics = { Default = true },
 	EquippedCosmetic = "Default",
@@ -207,16 +208,24 @@ function DataService:RecordRound(player, survived, soloSurvivor)
 	local data = profiles[player.UserId]
 	if not data then return end
 	data.RoundsPlayed += 1
+	local firstWinToday = false
 	if survived then
 		data.Wins += 1
 		data.CurrentWinStreak += 1
 		data.BestWinStreak = math.max(data.BestWinStreak, data.CurrentWinStreak)
 		self:AddCoins(player, Config.Rewards.Survival + (if soloSurvivor then Config.Rewards.SoloSurvivorBonus else 0), true)
+		local today = os.date("!%Y-%m-%d")
+		if data.LastDailyWin ~= today then
+			data.LastDailyWin = today
+			firstWinToday = true
+			self:AddCoins(player, Config.Rewards.FirstWinToday, true)
+		end
 	else
 		data.CurrentWinStreak = 0
 	end
 	self:AddCoins(player, Config.Rewards.Participation, true)
 	self:Push(player)
+	return firstWinToday
 end
 
 function DataService:BuyCosmetic(player, cosmeticId, price)

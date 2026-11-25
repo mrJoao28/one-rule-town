@@ -460,6 +460,8 @@ end)
 playerStateRemote.OnClientEvent:Connect(function(payload)
 	if payload.Type == "Danger" then
 		updateDanger(payload.Progress or 0)
+	elseif payload.Type == "DailyWin" then
+		notify("FIRST WIN TODAY! +" .. tostring(payload.Amount) .. " TOKENS", COLORS.Yellow, 4)
 	elseif payload.Type == "Eliminated" then
 		updateDanger(0)
 		currentState.AliveCount = payload.AliveCount or currentState.AliveCount

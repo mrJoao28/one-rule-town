@@ -2,17 +2,17 @@
 
 ## Player promise
 
-Every 90 seconds, the same compact town becomes a different challenge. Players should understand the current rule in under five seconds, create a funny failure worth sharing, and immediately want another round.
+About every 66 seconds, the same compact town becomes a different challenge. Players should understand the current rule in under six seconds, create a funny failure worth sharing, and immediately want another round.
 
 ## Round flow
 
-1. A 15-second intermission gathers players in the town square.
-2. The town reveals one rule for five seconds.
+1. An 8-second intermission gathers players in the town square.
+2. The town reveals one rule for six seconds.
 3. All eligible players start alive at distributed spawn points.
 4. The server checks the active rule every 0.1 seconds.
 5. Rule breakers ragdoll and move to the spectator roof.
-6. The round ends after 60 seconds, when nobody remains, or when one player remains from a multiplayer start.
-7. Survivors receive rewards, and the town resets for ten seconds.
+6. The round ends after 45 seconds, when nobody remains, or when one player remains from a multiplayer start.
+7. Survivors receive rewards, including a free first win of the UTC day bonus, and the town resets for seven seconds.
 
 ## Visual direction
 
