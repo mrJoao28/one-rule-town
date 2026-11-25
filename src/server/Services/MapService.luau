@@ -34,9 +34,10 @@ end
 local function addBillboard(parent: BasePart, text: string, color: Color3)
 	local gui = Instance.new("BillboardGui")
 	gui.Name = "Sign"
-	gui.Size = UDim2.fromOffset(260, 70)
+	gui.Size = UDim2.fromOffset(150, 42)
 	gui.StudsOffset = Vector3.new(0, parent.Size.Y / 2 + 1.5, 0)
-	gui.AlwaysOnTop = true
+	gui.AlwaysOnTop = false
+	gui.MaxDistance = 48
 	gui.Parent = parent
 
 	local label = Instance.new("TextLabel")

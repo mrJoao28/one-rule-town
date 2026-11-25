@@ -117,10 +117,10 @@ function CrowdService:CreateResident(index)
 	do
 		local badge = Instance.new("BillboardGui")
 		badge.Name = "ResidentName"
-		badge.Size = UDim2.fromOffset(130, 36)
+		badge.Size = UDim2.fromOffset(105, 28)
 		badge.StudsOffset = Vector3.new(0, 2.4, 0)
-		badge.AlwaysOnTop = true
-		badge.MaxDistance = 55
+		badge.AlwaysOnTop = false
+		badge.MaxDistance = 32
 		badge.Parent = resident.Head
 		local label = Instance.new("TextLabel")
 		label.Size = UDim2.fromScale(1, 1)
@@ -132,8 +132,8 @@ function CrowdService:CreateResident(index)
 		label.Parent = badge
 		local speech = Instance.new("TextLabel")
 		speech.Name = "Speech"
-		speech.Size = UDim2.fromOffset(130, 24)
-		speech.Position = UDim2.fromOffset(0, -26)
+		speech.Size = UDim2.fromOffset(105, 22)
+		speech.Position = UDim2.fromOffset(0, -23)
 		speech.BackgroundColor3 = color
 		speech.TextColor3 = Color3.fromRGB(22, 28, 43)
 		speech.Font = Enum.Font.GothamBlack

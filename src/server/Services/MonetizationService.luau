@@ -38,6 +38,13 @@ function MonetizationService:Initialize(networkService, dataService, roundServic
 		elseif category == "Pass" then
 			local passId = Config.Monetization.GamePasses[key]
 			if type(passId) == "number" and passId > 0 then
+				if player:GetAttribute(key) then return end
+				local success, owns = pcall(MarketplaceService.UserOwnsGamePassAsync, MarketplaceService, player.UserId, passId)
+				if not success then return end
+				if owns then
+					player:SetAttribute(key, true)
+					return
+				end
 				MarketplaceService:PromptGamePassPurchase(player, passId)
 			end
 		end

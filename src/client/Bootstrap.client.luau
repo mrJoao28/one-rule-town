@@ -1,6 +1,7 @@
 --!nonstrict
 
 local Players = game:GetService("Players")
+local MarketplaceService = game:GetService("MarketplaceService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
@@ -173,7 +174,7 @@ local aliveLabel = textLabel(aliveBadge, "Alive", "0 ALIVE", UDim2.fromScale(1, 
 
 local statsBadge = Instance.new("Frame")
 statsBadge.AnchorPoint = Vector2.new(1, 0)
-statsBadge.Position = UDim2.new(1 / scale.Scale, -25, 0, 25)
+statsBadge.Position = UDim2.new(1, -25, 0, 25)
 statsBadge.Size = UDim2.fromOffset(220, 74)
 statsBadge.BackgroundColor3 = COLORS.Dark
 statsBadge.Parent = gui
@@ -205,7 +206,7 @@ end
 
 local menuBar = Instance.new("Frame")
 menuBar.AnchorPoint = Vector2.new(0.5, 1)
-menuBar.Position = UDim2.new(0.5, 0, 1 / scale.Scale, -22)
+menuBar.Position = UDim2.new(0.5, 0, 1, -22)
 menuBar.Size = UDim2.fromOffset(420, 62)
 menuBar.BackgroundTransparency = 1
 menuBar.Parent = gui
@@ -256,6 +257,27 @@ local function shopItem(text, category, key, enabled)
 	value.ZIndex = 31
 	if enabled then
 		value.Activated:Connect(function() purchaseRemote:FireServer(category, key) end)
+		local id = if category == "Pass" then Config.Monetization.GamePasses[key] else Config.Monetization.DeveloperProducts[key].Id
+		task.spawn(function()
+			local success, info = pcall(function()
+				return MarketplaceService:GetProductInfoAsync(id, if category == "Pass" then Enum.InfoType.GamePass else Enum.InfoType.Product)
+			end)
+			if success and type(info.PriceInRobux) == "number" then
+				value.Text = text .. "  •  " .. tostring(info.PriceInRobux) .. " ROBUX"
+			end
+			if category == "Pass" and player:GetAttribute(key) then
+				value.Text = text .. "  •  OWNED"
+				value.Active = false
+			end
+		end)
+		if category == "Pass" then
+			player:GetAttributeChangedSignal(key):Connect(function()
+				if player:GetAttribute(key) then
+					value.Text = text .. "  •  OWNED"
+					value.Active = false
+				end
+			end)
+		end
 	else
 		value.Text = text .. "  •  NOT CONFIGURED"
 		value.AutoButtonColor = false
