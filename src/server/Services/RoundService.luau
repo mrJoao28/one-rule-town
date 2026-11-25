@@ -35,8 +35,12 @@ function RoundService:Initialize(networkService, mapService, ruleService, dataSe
 	self.Participants = {}
 	self.RoundNumber = 0
 	self.RoundStartedWith = 0
+	self.ReviveCooldown = setmetatable({}, { __mode = "k" })
 
 	self.UseRevive.OnServerEvent:Connect(function(player)
+		local now = os.clock()
+		if now - (self.ReviveCooldown[player] or -math.huge) < 0.5 then return end
+		self.ReviveCooldown[player] = now
 		self:TryRevive(player)
 	end)
 end

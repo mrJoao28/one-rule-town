@@ -11,7 +11,7 @@ local MonetizationService = {}
 function MonetizationService:Initialize(networkService, dataService, roundService)
 	self.DataService = dataService
 	self.RoundService = roundService
-	self.Cooldowns = {}
+	self.Cooldowns = setmetatable({}, { __mode = "k" })
 	self.ProductById = {}
 
 	for key, product in pairs(Config.Monetization.DeveloperProducts) do
@@ -56,9 +56,9 @@ function MonetizationService:Initialize(networkService, dataService, roundServic
 		if not player or not product then
 			return Enum.ProductPurchaseDecision.NotProcessedYet
 		end
-		local granted = self.DataService:ProcessReceipt(player, tostring(receiptInfo.PurchaseId), product.GrantKind, product.Amount)
-		if granted then
-			if product.GrantKind == "Revive" then
+		local processed, grantedNow = self.DataService:ProcessReceipt(player, tostring(receiptInfo.PurchaseId), product.GrantKind, product.Amount)
+		if processed then
+			if grantedNow and product.GrantKind == "Revive" then
 				task.defer(function() self.RoundService:TryRevive(player) end)
 			end
 			return Enum.ProductPurchaseDecision.PurchaseGranted

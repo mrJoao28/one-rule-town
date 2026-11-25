@@ -27,7 +27,8 @@ local function playerAdded(player)
 	RoundService:OnPlayerAdded(player)
 
 	task.spawn(function()
-		DataService:LoadPlayer(player)
+		local data = DataService:LoadPlayer(player)
+		if not data then return end
 		if player.Parent ~= Players then return end
 
 		MonetizationService:RefreshPasses(player)
@@ -35,7 +36,11 @@ local function playerAdded(player)
 	end)
 end
 
+local snapshotCooldown = setmetatable({}, { __mode = "k" })
 NetworkService:GetFunction("GetSnapshot").OnServerInvoke = function(player)
+	local now = os.clock()
+	if now - (snapshotCooldown[player] or -math.huge) < 1 then return nil end
+	snapshotCooldown[player] = now
 	return RoundService:GetSnapshot(player)
 end
 

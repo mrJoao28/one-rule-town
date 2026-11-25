@@ -16,7 +16,7 @@ end
 
 function CosmeticService:Initialize(networkService, dataService)
 	self.DataService = dataService
-	self.Cooldowns = {}
+	self.Cooldowns = setmetatable({}, { __mode = "k" })
 	self.Remote = networkService:GetEvent("CosmeticAction")
 	self.Remote.OnServerEvent:Connect(function(player, action, cosmeticId)
 		if type(action) ~= "string" or type(cosmeticId) ~= "string" then return end

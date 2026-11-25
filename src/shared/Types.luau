@@ -6,6 +6,7 @@ export type PlayerData = {
 	RoundsPlayed: number,
 	BestWinStreak: number,
 	CurrentWinStreak: number,
+	LastDailyWin: string,
 	ReviveCredits: number,
 	OwnedCosmetics: { [string]: boolean },
 	EquippedCosmetic: string,
