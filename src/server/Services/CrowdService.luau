@@ -82,7 +82,8 @@ function CrowdService:Initialize(mapService)
 		end
 	end)
 	task.spawn(function()
-		while self.Folder.Parent do
+		local folder = self.Folder
+		while folder.Parent and self.Folder == folder do
 			self:AdjustPopulation()
 			task.wait(3)
 		end
