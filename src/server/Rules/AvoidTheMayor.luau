@@ -2,39 +2,14 @@
 
 local RunService = game:GetService("RunService")
 local Utils = require(script.Parent.RuleUtils)
+local CharacterVisual = require(script.Parent.Parent.Services.CharacterVisual)
 
 local Rule = { Id = "AvoidTheMayor" }
 
 function Rule:Start(context)
-	local model = Instance.new("Model")
-	model.Name = "TheMayor"
+	local model, root = CharacterVisual.Create("TheMayor", Color3.fromRGB(143, 45, 64), Color3.fromRGB(232, 181, 140), true)
 	model.Parent = context.MapService.Map
-
-	local root = Instance.new("Part")
-	root.Name = "MayorRoot"
-	root.Shape = Enum.PartType.Ball
-	root.Size = Vector3.new(7, 7, 7)
-	root.Color = Color3.fromRGB(195, 39, 54)
-	root.Material = Enum.Material.Neon
-	root.Anchored = true
-	root.CanCollide = false
-	root.CFrame = CFrame.new(0, 5, 75)
-	root.Parent = model
-	model.PrimaryPart = root
-
-	local face = Instance.new("BillboardGui")
-	face.Size = UDim2.fromOffset(180, 55)
-	face.StudsOffset = Vector3.new(0, 5, 0)
-	face.AlwaysOnTop = true
-	face.Parent = root
-	local label = Instance.new("TextLabel")
-	label.Size = UDim2.fromScale(1, 1)
-	label.BackgroundColor3 = Color3.fromRGB(25, 28, 35)
-	label.TextColor3 = Color3.new(1, 1, 1)
-	label.Font = Enum.Font.GothamBlack
-	label.TextScaled = true
-	label.Text = "THE MAYOR"
-	label.Parent = face
+	model:PivotTo(CFrame.new(0, 4, 75))
 
 	self.Model = model
 	self.Connection = RunService.Heartbeat:Connect(function(deltaTime)
@@ -56,7 +31,7 @@ function Rule:Start(context)
 			local direction = flatTarget - root.Position
 			if direction.Magnitude > 0.1 then
 				local nextPosition = root.Position + direction.Unit * math.min(direction.Magnitude, 11 * deltaTime)
-				root.CFrame = CFrame.lookAt(nextPosition, flatTarget)
+				model:PivotTo(CFrame.lookAt(nextPosition, flatTarget))
 			end
 		end
 	end)

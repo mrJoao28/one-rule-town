@@ -95,8 +95,12 @@ end
 
 local function createTree(parent: Instance, position: Vector3)
 	part(parent, "TreeTrunk", Vector3.new(2, 7, 2), CFrame.new(position + Vector3.new(0, 3.5, 0)), Color3.fromRGB(111, 77, 54), Enum.Material.Wood)
-	local crown = part(parent, "TreeCrown", Vector3.new(7, 7, 7), CFrame.new(position + Vector3.new(0, 8, 0)), COLORS.Green, Enum.Material.Grass)
-	crown.Shape = Enum.PartType.Ball
+	for _, offset in { Vector3.new(-2.4, 8, 0), Vector3.new(2.4, 8, 0), Vector3.new(0, 10, 0) } do
+		local crown = part(parent, "TreeCrown", Vector3.new(6, 6, 6), CFrame.new(position + offset), COLORS.Green, Enum.Material.Grass)
+		crown.Shape = Enum.PartType.Ball
+		crown.CanCollide = false
+	end
+	part(parent, "TreePlanter", Vector3.new(6, 0.6, 6), CFrame.new(position + Vector3.new(0, 0.2, 0)), Color3.fromRGB(166, 130, 100), Enum.Material.Brick)
 end
 
 local function decorateTown(parent: Instance)
@@ -140,6 +144,15 @@ local function decorateTown(parent: Instance)
 		part(parent, "ParkBenchSeat", Vector3.new(7, 0.5, 2), CFrame.new(position + Vector3.new(0, 1.7, 0)), Color3.fromRGB(139, 81, 55), Enum.Material.Wood)
 		part(parent, "ParkBenchBack", Vector3.new(7, 2, 0.4), CFrame.new(position + Vector3.new(0, 2.6, 1)), Color3.fromRGB(139, 81, 55), Enum.Material.Wood)
 	end
+	-- The outer blocks frame the playable town without obstructing the rule zones.
+	for _, position in {
+		Vector3.new(-81, 0, -81), Vector3.new(81, 0, -81),
+		Vector3.new(-81, 0, 81), Vector3.new(81, 0, 81),
+	} do
+		local base = part(parent, "CornerKiosk", Vector3.new(10, 7, 10), CFrame.new(position + Vector3.new(0, 3.5, 0)), Color3.fromRGB(227, 193, 139), Enum.Material.Brick)
+		part(parent, "KioskRoof", Vector3.new(12, 1, 12), CFrame.new(position + Vector3.new(0, 7.5, 0)), COLORS.Red, Enum.Material.Slate)
+		base.CanCollide = true
+	end
 end
 
 function MapService:Initialize()
@@ -152,6 +165,8 @@ function MapService:Initialize()
 	Lighting.Brightness = 2.5
 	Lighting.Ambient = Color3.fromRGB(128, 137, 155)
 	Lighting.OutdoorAmbient = Color3.fromRGB(155, 165, 180)
+	Lighting.GlobalShadows = true
+	Lighting.ExposureCompensation = 0.1
 	pcall(function()
 		Lighting.Technology = Enum.Technology.Future
 	end)
@@ -161,6 +176,12 @@ function MapService:Initialize()
 	atmosphere.Haze = 1
 	atmosphere.Color = Color3.fromRGB(212, 231, 255)
 	atmosphere.Parent = Lighting
+	local colorCorrection = Lighting:FindFirstChild("TownColor") or Instance.new("ColorCorrectionEffect")
+	colorCorrection.Name = "TownColor"
+	colorCorrection.Contrast = 0.12
+	colorCorrection.Saturation = 0.12
+	colorCorrection.TintColor = Color3.fromRGB(255, 243, 226)
+	colorCorrection.Parent = Lighting
 
 	local map = Instance.new("Model")
 	map.Name = MAP_NAME
@@ -197,6 +218,8 @@ function MapService:Initialize()
 	local clock = part(environment, "TownClock", Vector3.new(9, 6, 1), CFrame.new(0, 18, -4.5), Color3.fromRGB(27, 31, 39))
 	addBillboard(clock, "ONE RULE TOWN", COLORS.Yellow)
 	CollectionService:AddTag(townHall, "FloorIsLavaSafe")
+	part(environment, "TowerCap", Vector3.new(11, 2, 11), CFrame.new(0, 25.5, 0), Color3.fromRGB(44, 57, 74), Enum.Material.Slate)
+	part(environment, "ClockFace", Vector3.new(6, 6, 0.4), CFrame.new(0, 18, -5.1), Color3.fromRGB(248, 231, 184), Enum.Material.Neon).CanCollide = false
 
 	createBuilding(environment, "Diner", Vector3.new(-52, 0.5, -52), Vector3.new(32, 17, 26), Color3.fromRGB(240, 111, 126), "TOWN DINER")
 	createBuilding(environment, "MiniMarket", Vector3.new(52, 0.5, -52), Vector3.new(30, 15, 24), COLORS.Blue, "MINI MARKET")
