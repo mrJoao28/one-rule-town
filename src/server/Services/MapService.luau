@@ -3,6 +3,7 @@
 local CollectionService = game:GetService("CollectionService")
 local Lighting = game:GetService("Lighting")
 local Workspace = game:GetService("Workspace")
+local CharacterVisual = require(script.Parent.CharacterVisual)
 
 local MapService = {}
 
@@ -243,6 +244,10 @@ local function createIntroSet()
 	text.TextScaled = true
 	text.TextWrapped = true
 	text.Parent = screen
+
+	local mayor = CharacterVisual.Create("OpeningMayor", Color3.fromRGB(143, 45, 64), Color3.fromRGB(232, 181, 140), true)
+	mayor:PivotTo(CFrame.new(9, 4, -260) * CFrame.Angles(0, math.pi, 0))
+	mayor.Parent = scene
 end
 
 function MapService:Initialize(layoutId: number?)

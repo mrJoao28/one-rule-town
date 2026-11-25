@@ -207,12 +207,16 @@ end
 local menuBar = Instance.new("Frame")
 menuBar.AnchorPoint = Vector2.new(0.5, 1)
 menuBar.Position = UDim2.new(0.5, 0, 1, -22)
-menuBar.Size = UDim2.fromOffset(420, 62)
+menuBar.Size = UDim2.new(1, -20, 0, 62)
 menuBar.BackgroundTransparency = 1
 menuBar.Parent = gui
-local shopButton = button(menuBar, "Shop", "SHOP", UDim2.fromOffset(110, 58), UDim2.fromOffset(0, 0), COLORS.Blue)
-local cosmeticsButton = button(menuBar, "Cosmetics", "COSMETICS", UDim2.fromOffset(170, 58), UDim2.fromOffset(120, 0), Color3.fromRGB(168, 91, 230))
-local helpButton = button(menuBar, "Help", "HOW TO PLAY", UDim2.fromOffset(120, 58), UDim2.fromOffset(300, 0), COLORS.Green)
+local menuLimit = Instance.new("UISizeConstraint")
+menuLimit.MaxSize = Vector2.new(540, 62)
+menuLimit.Parent = menuBar
+local shopButton = button(menuBar, "Shop", "SHOP", UDim2.new(0.2, -4, 0, 58), UDim2.new(0, 0, 0, 0), COLORS.Blue)
+local cosmeticsButton = button(menuBar, "Cosmetics", "COSMETICS", UDim2.new(0.31, -4, 0, 58), UDim2.new(0.21, 0, 0, 0), Color3.fromRGB(168, 91, 230))
+local helpButton = button(menuBar, "Help", "HOW TO PLAY", UDim2.new(0.23, -4, 0, 58), UDim2.new(0.53, 0, 0, 0), COLORS.Green)
+local introButton = button(menuBar, "ReplayIntro", "REPLAY INTRO", UDim2.new(0.23, -4, 0, 58), UDim2.new(0.77, 0, 0, 0), COLORS.Yellow)
 
 local function makeModal(name, titleText)
 	local panel = Instance.new("Frame")
@@ -367,6 +371,16 @@ helpButton.Activated:Connect(function()
 	helpPanel.Visible = not helpPanel.Visible
 	shopPanel.Visible = false
 	cosmeticsPanel.Visible = false
+end)
+introButton.Activated:Connect(function()
+	if currentState.State ~= "Results" and currentState.State ~= "WaitingForPlayers" then
+		notify("REPLAY AFTER THE ROUND", COLORS.Yellow, 2)
+		return
+	end
+	shopPanel.Visible = false
+	cosmeticsPanel.Visible = false
+	helpPanel.Visible = false
+	player:SetAttribute("ReplayIntroRequest", (player:GetAttribute("ReplayIntroRequest") or 0) + 1)
 end)
 
 local function updateCosmetics()
@@ -539,56 +553,4 @@ UserInputService.InputBegan:Connect(function(input, processed)
 		cosmeticsPanel.Visible = not cosmeticsPanel.Visible
 		shopPanel.Visible = false
 	end
-end)
-
--- A short original scene introduces the rule before the normal camera takes over.
-task.spawn(function()
-	local scene = workspace:WaitForChild("OneRuleIntro", 10)
-	local camera = workspace.CurrentCamera
-	if not scene or not camera then return end
-	local intro = Instance.new("ScreenGui")
-	intro.Name = "OneRuleOpening"
-	intro.DisplayOrder = 50
-	intro.IgnoreGuiInset = true
-	intro.ResetOnSpawn = false
-	intro.Parent = player:WaitForChild("PlayerGui")
-	local shade = Instance.new("Frame")
-	shade.Size = UDim2.fromScale(1, 1)
-	shade.BackgroundColor3 = Color3.fromRGB(10, 16, 32)
-	shade.BackgroundTransparency = 0.62
-	shade.Parent = intro
-	local title = textLabel(shade, "OpeningTitle", "THE VIDEO SAYS...", UDim2.new(0.8, 0, 0, 65), UDim2.new(0.1, 0, 0.12, 0), Enum.Font.GothamBlack, COLORS.Yellow)
-	title.TextStrokeTransparency = 0.2
-	local caption = textLabel(shade, "OpeningCaption", "One strange rule. One whole town watching.", UDim2.new(0.8, 0, 0, 48), UDim2.new(0.1, 0, 0.73, 0), Enum.Font.GothamBold, COLORS.Cream)
-	caption.TextStrokeTransparency = 0.25
-	local enter = button(shade, "EnterTown", "PLAY NOW", UDim2.fromOffset(260, 64), UDim2.new(0.5, -130, 0.86, -32), COLORS.Blue)
-	local finished = false
-	local animation
-	local function finishIntro()
-		if finished then return end
-		finished = true
-		if animation then animation:Cancel() end
-		local fade = TweenService:Create(shade, TweenInfo.new(0.25), { BackgroundTransparency = 0 })
-		fade:Play()
-		fade.Completed:Wait()
-		camera.CameraType = Enum.CameraType.Custom
-		local character = player.Character
-		local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-		if humanoid then camera.CameraSubject = humanoid end
-		intro:Destroy()
-	end
-	enter.Activated:Connect(finishIntro)
-	camera.CameraType = Enum.CameraType.Scriptable
-	camera.CFrame = CFrame.lookAt(Vector3.new(8, 7, -239), Vector3.new(0, 4, -258))
-	animation = TweenService:Create(camera, TweenInfo.new(3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-		CFrame = CFrame.lookAt(Vector3.new(4, 5.8, -247), Vector3.new(0, 4.7, -256)),
-	})
-	animation:Play()
-	task.delay(2.8, function()
-		if finished then return end
-		title.Text = "HUSS HUSS! THE TOWN HAS ONE RULE"
-		caption.Text = "Can you survive the next round?"
-	end)
-	-- Do not leave an unattended player stuck behind a cinematic camera.
-	task.delay(12, finishIntro)
 end)

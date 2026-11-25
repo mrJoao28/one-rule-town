@@ -7,7 +7,7 @@ One Rule Town is a server-authoritative Roblox party game built with Luau and Ro
 ## MVP features
 
 - Two rotating town layouts, Sunny Square and Festival Night, with distinct lighting and landmarks while preserving the tagged rule zones.
-- An original opening scene with a resident watching a HUSS HUSS phone clip, a Play button, and automatic camera return.
+- An original 11-second opening with a resident watching a HUSS HUSS phone clip, the Mayor, a town flyover, asset loading, Skip after two seconds, Replay Intro, and automatic camera/control restoration.
 - Code-generated town with an entry gate, shopfronts, token sculptures, safe platforms, light zones, and a spectator roof.
 - Eleven modular rules with server-side validation.
 - Intermission, rule reveal, active round, elimination, revive, results, and reward states.
