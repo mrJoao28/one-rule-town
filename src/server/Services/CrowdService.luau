@@ -30,6 +30,8 @@ local function limb(model, name, size, color, position)
 end
 
 function CrowdService:Initialize(mapService)
+	if self.Connection then self.Connection:Disconnect() end
+	if self.Folder then self.Folder:Destroy() end
 	self.Map = mapService
 	self.Folder = Instance.new("Folder")
 	self.Folder.Name = "TownResidents"

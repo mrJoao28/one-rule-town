@@ -20,6 +20,8 @@ The MVP uses a colorful toy-town style with an unsettling civic-broadcast layer.
 
 The map prioritizes readable silhouettes and short travel distances over realism. Every important rule location is visible or reachable from the central square.
 
+Sunny Square and Festival Night alternate after results. Their architecture, lighting, and outer landmarks differ, while spawn locations and tagged challenge zones remain consistent. New visitors see an original short scene of a resident on a sofa watching a fictional HUSS HUSS phone clip. The player can enter immediately or the camera returns automatically after twelve seconds.
+
 ## Progression
 
 Players earn Town Tokens through participation, survival, and being the only survivor. Tokens buy visible effects rather than gameplay power. Wins and win streaks provide long-term goals without blocking new players.

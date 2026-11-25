@@ -98,6 +98,7 @@ function RoundService:GetSnapshot(player)
 		IsAlive = self:IsAlive(player),
 		CanRevive = self:CanRevive(player),
 		RoundNumber = self.RoundNumber,
+		MapName = self.MapService.MapName,
 		Data = self.DataService:GetPublic(player),
 	}
 end
@@ -111,6 +112,7 @@ function RoundService:BroadcastState(extra)
 		Rule = self.CurrentRuleId and RuleCatalog[self.CurrentRuleId] or nil,
 		AliveCount = #self:GetAlivePlayers(),
 		RoundNumber = self.RoundNumber,
+		MapName = self.MapService.MapName,
 	}
 	for key, value in pairs(extra or {}) do payload[key] = value end
 	self.GameState:FireAllClients(payload)
@@ -291,6 +293,11 @@ function RoundService:Start()
 			self:RunTimer(Config.ResultsDuration)
 			self.Alive = {}
 			self.Participants = {}
+			self.MapService:Initialize((self.MapService.LayoutId % 2) + 1)
+			self.CrowdService:Initialize(self.MapService)
+			for _, player in Players:GetPlayers() do
+				self:TeleportPlayer(player, self.MapService.LobbyPosition)
+			end
 		end
 	end)
 end

@@ -129,8 +129,8 @@ local ruleStroke = stroke(ruleCard, COLORS.Yellow, 4, 0)
 
 local stateLabel = textLabel(ruleCard, "State", "WAITING FOR THE TOWN", UDim2.fromOffset(420, 25), UDim2.fromOffset(90, 8), Enum.Font.GothamBold, COLORS.Muted)
 local ruleLabel = textLabel(ruleCard, "Rule", "ONE RULE TOWN", UDim2.fromOffset(520, 52), UDim2.fromOffset(40, 34), Enum.Font.GothamBlack, COLORS.Cream)
-local descriptionLabel = textLabel(ruleCard, "Description", "Every round, the town makes one absurd rule.", UDim2.fromOffset(480, 32), UDim2.fromOffset(60, 88), Enum.Font.GothamMedium, Color3.new(1, 1, 1))
-local timerLabel = textLabel(ruleCard, "Timer", "--", UDim2.fromOffset(75, 55), UDim2.fromOffset(510, 87), Enum.Font.GothamBlack, COLORS.Yellow)
+local descriptionLabel = textLabel(ruleCard, "Description", "Every round, the town makes one absurd rule.", UDim2.fromOffset(445, 40), UDim2.fromOffset(40, 91), Enum.Font.GothamMedium, Color3.new(1, 1, 1))
+local timerLabel = textLabel(ruleCard, "Timer", "--", UDim2.fromOffset(75, 48), UDim2.fromOffset(515, 90), Enum.Font.GothamBlack, COLORS.Yellow)
 
 local dangerPanel = Instance.new("Frame")
 dangerPanel.Name = "RuleDanger"
@@ -437,7 +437,7 @@ local function applyState(payload)
 		ruleStroke.Color = rule.Accent
 	else
 		ruleLabel.Text = currentState.State == "Results" and "THE TOWN HAS DECIDED" or "ONE RULE TOWN"
-		descriptionLabel.Text = currentState.State == "Intermission" and "Get ready for another absurd rule." or "Read the rule. Follow it. Survive."
+		descriptionLabel.Text = currentState.State == "Intermission" and ("Next: " .. tostring(currentState.MapName or "the town")) or "Read the rule. Follow it. Survive."
 		ruleLabel.TextColor3 = COLORS.Cream
 		timerLabel.TextColor3 = COLORS.Yellow
 		ruleStroke.Color = COLORS.Yellow
@@ -539,4 +539,56 @@ UserInputService.InputBegan:Connect(function(input, processed)
 		cosmeticsPanel.Visible = not cosmeticsPanel.Visible
 		shopPanel.Visible = false
 	end
+end)
+
+-- A short original scene introduces the rule before the normal camera takes over.
+task.spawn(function()
+	local scene = workspace:WaitForChild("OneRuleIntro", 10)
+	local camera = workspace.CurrentCamera
+	if not scene or not camera then return end
+	local intro = Instance.new("ScreenGui")
+	intro.Name = "OneRuleOpening"
+	intro.DisplayOrder = 50
+	intro.IgnoreGuiInset = true
+	intro.ResetOnSpawn = false
+	intro.Parent = player:WaitForChild("PlayerGui")
+	local shade = Instance.new("Frame")
+	shade.Size = UDim2.fromScale(1, 1)
+	shade.BackgroundColor3 = Color3.fromRGB(10, 16, 32)
+	shade.BackgroundTransparency = 0.62
+	shade.Parent = intro
+	local title = textLabel(shade, "OpeningTitle", "THE VIDEO SAYS...", UDim2.new(0.8, 0, 0, 65), UDim2.new(0.1, 0, 0.12, 0), Enum.Font.GothamBlack, COLORS.Yellow)
+	title.TextStrokeTransparency = 0.2
+	local caption = textLabel(shade, "OpeningCaption", "One strange rule. One whole town watching.", UDim2.new(0.8, 0, 0, 48), UDim2.new(0.1, 0, 0.73, 0), Enum.Font.GothamBold, COLORS.Cream)
+	caption.TextStrokeTransparency = 0.25
+	local enter = button(shade, "EnterTown", "PLAY NOW", UDim2.fromOffset(260, 64), UDim2.new(0.5, -130, 0.86, -32), COLORS.Blue)
+	local finished = false
+	local animation
+	local function finishIntro()
+		if finished then return end
+		finished = true
+		if animation then animation:Cancel() end
+		local fade = TweenService:Create(shade, TweenInfo.new(0.25), { BackgroundTransparency = 0 })
+		fade:Play()
+		fade.Completed:Wait()
+		camera.CameraType = Enum.CameraType.Custom
+		local character = player.Character
+		local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+		if humanoid then camera.CameraSubject = humanoid end
+		intro:Destroy()
+	end
+	enter.Activated:Connect(finishIntro)
+	camera.CameraType = Enum.CameraType.Scriptable
+	camera.CFrame = CFrame.lookAt(Vector3.new(8, 7, -239), Vector3.new(0, 4, -258))
+	animation = TweenService:Create(camera, TweenInfo.new(3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+		CFrame = CFrame.lookAt(Vector3.new(4, 5.8, -247), Vector3.new(0, 4.7, -256)),
+	})
+	animation:Play()
+	task.delay(2.8, function()
+		if finished then return end
+		title.Text = "HUSS HUSS! THE TOWN HAS ONE RULE"
+		caption.Text = "Can you survive the next round?"
+	end)
+	-- Do not leave an unattended player stuck behind a cinematic camera.
+	task.delay(12, finishIntro)
 end)

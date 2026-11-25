@@ -104,7 +104,7 @@ local function createTree(parent: Instance, position: Vector3)
 	part(parent, "TreePlanter", Vector3.new(6, 0.6, 6), CFrame.new(position + Vector3.new(0, 0.2, 0)), Color3.fromRGB(166, 130, 100), Enum.Material.Brick)
 end
 
-local function decorateTown(parent: Instance)
+local function decorateTown(parent: Instance, layoutId: number)
 	-- A coherent street layout provides visual anchors in every short video clip.
 	for _, side in { -1, 1 } do
 		part(parent, "Sidewalk", Vector3.new(7, 0.5, 180), CFrame.new(side * 19, 0.55, 0), COLORS.Sidewalk, Enum.Material.Pavement)
@@ -162,6 +162,32 @@ local function decorateTown(parent: Instance)
 		part(parent, "ParkBenchSeat", Vector3.new(7, 0.5, 2), CFrame.new(position + Vector3.new(0, 1.7, 0)), Color3.fromRGB(139, 81, 55), Enum.Material.Wood)
 		part(parent, "ParkBenchBack", Vector3.new(7, 2, 0.4), CFrame.new(position + Vector3.new(0, 2.6, 1)), Color3.fromRGB(139, 81, 55), Enum.Material.Wood)
 	end
+	if layoutId == 2 then
+		-- Festival Night uses overhead ribbons and lit kiosks without changing the rule geometry.
+		for _, z in { -68, -44, 44, 68 } do
+			local ribbon = part(parent, "FestivalRibbon", Vector3.new(43, 0.35, 0.7), CFrame.new(0, 16, z), Color3.fromRGB(177, 92, 235), Enum.Material.Neon)
+			ribbon.CanCollide = false
+			for _, x in { -16, -8, 0, 8, 16 } do
+				local lantern = part(parent, "FestivalLantern", Vector3.new(2.3, 2.3, 2.3), CFrame.new(x, 14.5, z), if x % 16 == 0 then COLORS.Yellow else COLORS.Red, Enum.Material.Neon)
+				lantern.Shape = Enum.PartType.Ball
+				lantern.CanCollide = false
+			end
+		end
+		for _, x in { -75, 75 } do
+			local stand = part(parent, "FestivalStand", Vector3.new(14, 4, 9), CFrame.new(x, 2, -43), Color3.fromRGB(104, 75, 177), Enum.Material.Wood)
+			part(parent, "FestivalCanopy", Vector3.new(17, 1, 11), CFrame.new(x, 4.5, -43), COLORS.Yellow, Enum.Material.Fabric)
+			addBillboard(stand, "NIGHT MARKET", COLORS.Yellow)
+		end
+	else
+		-- Sunny Square adds a visible play area without blocking the crossroad.
+		for _, x in { -75, 75 } do
+			local fountain = part(parent, "ParkFountain", Vector3.new(12, 1.5, 12), CFrame.new(x, 0.8, -43), COLORS.Blue, Enum.Material.Marble)
+			fountain.Shape = Enum.PartType.Ball
+			local water = part(parent, "FountainWater", Vector3.new(8, 0.15, 8), CFrame.new(x, 1.64, -43), Color3.fromRGB(105, 217, 255), Enum.Material.Glass)
+			water.Shape = Enum.PartType.Ball
+			water.CanCollide = false
+		end
+	end
 	-- The outer blocks frame the playable town without obstructing the rule zones.
 	for _, position in {
 		Vector3.new(-81, 0, -81), Vector3.new(81, 0, -81),
@@ -173,13 +199,62 @@ local function decorateTown(parent: Instance)
 	end
 end
 
-function MapService:Initialize()
+local function createIntroSet()
+	if Workspace:FindFirstChild("OneRuleIntro") then return end
+	local scene = Instance.new("Model")
+	scene.Name = "OneRuleIntro"
+	scene.Parent = Workspace
+	part(scene, "StudioFloor", Vector3.new(34, 1, 30), CFrame.new(0, -0.5, -255), Color3.fromRGB(43, 53, 89), Enum.Material.Fabric)
+	part(scene, "StudioWall", Vector3.new(34, 17, 1), CFrame.new(0, 8, -270), Color3.fromRGB(26, 34, 61))
+	for _, x in { -12, 12 } do
+		local lamp = part(scene, "StudioLight", Vector3.new(2, 7, 2), CFrame.new(x, 3.5, -264), Color3.fromRGB(255, 188, 71), Enum.Material.Neon)
+		lamp.CanCollide = false
+		local glow = Instance.new("PointLight")
+		glow.Color = lamp.Color
+		glow.Range = 22
+		glow.Brightness = 2
+		glow.Parent = lamp
+	end
+	part(scene, "SofaSeat", Vector3.new(11, 2, 4), CFrame.new(0, 1.3, -258), Color3.fromRGB(105, 89, 199), Enum.Material.Fabric)
+	part(scene, "SofaBack", Vector3.new(11, 5, 1.5), CFrame.new(0, 3.5, -260), Color3.fromRGB(84, 69, 170), Enum.Material.Fabric)
+	for _, x in { -5, 5 } do
+		part(scene, "SofaArm", Vector3.new(1.5, 3.2, 5), CFrame.new(x, 2, -258), Color3.fromRGB(72, 59, 150), Enum.Material.Fabric)
+	end
+	part(scene, "ViewerBody", Vector3.new(2.8, 2.6, 1.4), CFrame.new(0, 3.5, -257.8), Color3.fromRGB(79, 198, 235))
+	local head = part(scene, "ViewerHead", Vector3.new(1.9, 1.9, 1.9), CFrame.new(0, 5.6, -257.8), Color3.fromRGB(246, 193, 148))
+	head.Shape = Enum.PartType.Ball
+	part(scene, "ViewerHair", Vector3.new(2.1, 0.6, 2), CFrame.new(0, 6.4, -257.8), Color3.fromRGB(51, 37, 59))
+	for _, x in { -0.75, 0.75 } do
+		part(scene, "ViewerLeg", Vector3.new(0.8, 1, 3.8), CFrame.new(x, 2, -255.5), Color3.fromRGB(35, 45, 75))
+		part(scene, "ViewerArm", Vector3.new(0.6, 1.8, 0.7), CFrame.new(x * 1.9, 3.4, -256.4), Color3.fromRGB(246, 193, 148))
+	end
+	local phone = part(scene, "Phone", Vector3.new(1.8, 2.6, 0.25), CFrame.new(0, 4.3, -255.25), Color3.fromRGB(14, 20, 35), Enum.Material.Metal)
+	phone.CanCollide = false
+	local screen = Instance.new("SurfaceGui")
+	screen.Face = Enum.NormalId.Back
+	screen.CanvasSize = Vector2.new(180, 260)
+	screen.Parent = phone
+	local text = Instance.new("TextLabel")
+	text.Size = UDim2.fromScale(1, 1)
+	text.BackgroundColor3 = Color3.fromRGB(43, 89, 192)
+	text.TextColor3 = Color3.fromRGB(255, 237, 92)
+	text.Text = "HUSS HUSS!\n🏀\nONE RULE"
+	text.Font = Enum.Font.GothamBlack
+	text.TextScaled = true
+	text.TextWrapped = true
+	text.Parent = screen
+end
+
+function MapService:Initialize(layoutId: number?)
+	createIntroSet()
+	self.LayoutId = layoutId or 1
+	self.MapName = if self.LayoutId == 2 then "Festival Night" else "Sunny Square"
 	local old = Workspace:FindFirstChild(MAP_NAME)
 	if old then
 		old:Destroy()
 	end
 
-	Lighting.ClockTime = 14
+	Lighting.ClockTime = if self.LayoutId == 2 then 19 else 14
 	Lighting.Brightness = 2.5
 	Lighting.Ambient = Color3.fromRGB(128, 137, 155)
 	Lighting.OutdoorAmbient = Color3.fromRGB(155, 165, 180)
@@ -192,13 +267,13 @@ function MapService:Initialize()
 	local atmosphere = Lighting:FindFirstChildOfClass("Atmosphere") or Instance.new("Atmosphere")
 	atmosphere.Density = 0.25
 	atmosphere.Haze = 1
-	atmosphere.Color = Color3.fromRGB(212, 231, 255)
+	atmosphere.Color = if self.LayoutId == 2 then Color3.fromRGB(153, 164, 218) else Color3.fromRGB(212, 231, 255)
 	atmosphere.Parent = Lighting
 	local colorCorrection = Lighting:FindFirstChild("TownColor") or Instance.new("ColorCorrectionEffect")
 	colorCorrection.Name = "TownColor"
 	colorCorrection.Contrast = 0.12
 	colorCorrection.Saturation = 0.12
-	colorCorrection.TintColor = Color3.fromRGB(255, 243, 226)
+	colorCorrection.TintColor = if self.LayoutId == 2 then Color3.fromRGB(194, 189, 255) else Color3.fromRGB(255, 243, 226)
 	colorCorrection.Parent = Lighting
 
 	local map = Instance.new("Model")
@@ -221,7 +296,7 @@ function MapService:Initialize()
 	local roadB = part(environment, "CrossRoad", Vector3.new(190, 1, 28), CFrame.new(0, 0.1, 0), COLORS.Road, Enum.Material.Asphalt)
 	CollectionService:AddTag(roadA, "TownFloor")
 	CollectionService:AddTag(roadB, "TownFloor")
-	decorateTown(environment)
+	decorateTown(environment, self.LayoutId)
 
 	part(environment, "Square", Vector3.new(38, 1.2, 38), CFrame.new(0, 0.65, 0), COLORS.Cream, Enum.Material.Pavement)
 
@@ -239,9 +314,9 @@ function MapService:Initialize()
 	part(environment, "TowerCap", Vector3.new(11, 2, 11), CFrame.new(0, 25.5, 0), Color3.fromRGB(44, 57, 74), Enum.Material.Slate)
 	part(environment, "ClockFace", Vector3.new(6, 6, 0.4), CFrame.new(0, 18, -5.1), Color3.fromRGB(248, 231, 184), Enum.Material.Neon).CanCollide = false
 
-	createBuilding(environment, "Diner", Vector3.new(-52, 0.5, -52), Vector3.new(32, 17, 26), Color3.fromRGB(240, 111, 126), "TOWN DINER")
+	createBuilding(environment, "Diner", Vector3.new(-52, 0.5, -52), Vector3.new(32, 17, 26), if self.LayoutId == 2 then Color3.fromRGB(181, 91, 221) else Color3.fromRGB(240, 111, 126), "TOWN DINER")
 	createBuilding(environment, "MiniMarket", Vector3.new(52, 0.5, -52), Vector3.new(30, 15, 24), COLORS.Blue, "MINI MARKET")
-	createBuilding(environment, "TownLibrary", Vector3.new(-52, 0.5, 52), Vector3.new(32, 19, 26), Color3.fromRGB(193, 148, 94), "LIBRARY")
+	createBuilding(environment, "TownLibrary", Vector3.new(-52, 0.5, 52), Vector3.new(32, 19, 26), if self.LayoutId == 2 then Color3.fromRGB(101, 126, 202) else Color3.fromRGB(193, 148, 94), "LIBRARY")
 	createBuilding(environment, "Garage", Vector3.new(52, 0.5, 52), Vector3.new(34, 16, 26), COLORS.Yellow, "GARAGE")
 
 	for _, position in {
